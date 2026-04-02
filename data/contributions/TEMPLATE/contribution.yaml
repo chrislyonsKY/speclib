@@ -1,0 +1,38 @@
+# speclib Contribution Manifest
+# Copy this directory, fill in your data, and submit a Pull Request.
+# See CONTRIBUTING.md for full instructions.
+
+# ── Contributor Information (REQUIRED) ──────────────────────────
+contributor:
+  name: ""          # Your full name
+  affiliation: ""   # Institutional affiliation (university, agency, lab) — REQUIRED
+  email: ""         # Contact email for verification — REQUIRED
+  orcid: ""         # ORCID iD (optional but encouraged)
+
+# ── Data Source ─────────────────────────────────────────────────
+source: CUSTOM
+license: "CC-BY-4.0"   # Data license — REQUIRED (CC-BY-4.0 recommended)
+citation: ""            # Publication citation if applicable
+
+# ── Instrument & Calibration ────────────────────────────────────
+instrument: ""              # e.g., "ASD FieldSpec 4", "CID CI-710"
+measurement_type: FIELD     # LABORATORY | FIELD | AIRBORNE | SPACEBORNE
+calibrated: true            # REQUIRED — must be true, uncalibrated data is rejected
+calibration_method: ""      # REQUIRED — describe calibration (e.g., "Spectralon white reference")
+
+# ── Classification ──────────────────────────────────────────────
+material_category: VEGETATION   # MINERAL | ROCK | SOIL | VEGETATION | WATER | MANMADE | MIXTURE
+
+# ── Spatial Reference (optional) ────────────────────────────────
+crs: "EPSG:4326"   # Coordinate reference system for geolocation data
+
+# ── Spectra ─────────────────────────────────────────────────────
+# List each CSV file and its metadata.
+# CSV format: wavelength_um,reflectance[,error]
+spectra:
+  - file: "example_spectrum.csv"
+    name: "Example spectrum"
+    material_name: "Species or material name"
+    locality: "Collection site"
+    measurement_date: "2026-01-01"
+    description: "Brief description of the measurement"

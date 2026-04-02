@@ -40,12 +40,22 @@ content_code_copy = true
   icon = "fontawesome/brands/github"
   link = "https://github.com/chrislyonsKY/speclib"
 
+[theme.custom_dir]
+path = "docs/overrides"
+
 [extra_css]
-files = ["stylesheets/extra.css"]
+files = ["stylesheets/extra.css", "stylesheets/library.css"]
+
+[extra_javascript]
+files = ["js/spectral-viewer.js"]
 
 [[nav]]
 title = "Home"
 path = "index.md"
+
+[[nav]]
+title = "Library Browser"
+path = "library.md"
 
 [[nav]]
 title = "Getting Started"
@@ -56,6 +66,7 @@ title = "User Guide"
 children = [
   { title = "Installation", path = "guide/installation.md" },
   { title = "Spectral Data Model", path = "guide/data-model.md" },
+  { title = "Quality Standards", path = "guide/quality-standards.md" },
   { title = "Ingestion", path = "guide/ingestion.md" },
   { title = "Export Formats", path = "guide/export.md" },
   { title = "Resampling", path = "guide/resampling.md" },

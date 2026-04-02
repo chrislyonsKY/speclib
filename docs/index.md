@@ -48,4 +48,5 @@ Upstream Sources → Ingestion Adapters → HDF5 Archive
 ```
 
 [Get started](getting-started.md){ .md-button .md-button--primary }
+[Browse the Library](library.md){ .md-button }
 [View on GitHub](https://github.com/chrislyonsKY/speclib){ .md-button }
