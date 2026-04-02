@@ -36,9 +36,13 @@ const SL = (() => {
   // ── Initialization ──────────────────────────────────────────────
 
   function init() {
+    console.log("[speclib] init() called, DATA_URL =", DATA_URL);
+    console.log("[speclib] d3 available:", typeof d3 !== "undefined");
+    console.log("[speclib] #sl-chart:", document.getElementById("sl-chart"));
     fetchCatalog();
     setupEventListeners();
     setupChart();
+    console.log("[speclib] setupChart done, svg:", svg ? "created" : "null");
   }
 
   async function fetchCatalog() {
@@ -151,6 +155,7 @@ const SL = (() => {
   // ── Spectrum Loading ────────────────────────────────────────────
 
   async function onSpectrumClick(catalogEntry) {
+    console.log("[speclib] clicked:", catalogEntry.id, "svg:", !!svg, "chartG:", !!chartG);
     if (loaded.length >= MAX_OVERLAY) {
       loaded.shift();
     }
