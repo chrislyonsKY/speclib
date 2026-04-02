@@ -5,7 +5,49 @@
       "sources": {
         "KY_FIELD": 136
       }
+    },
+    "MANMADE": {
+      "count": 282,
+      "sources": {
+        "USGS_SPLIB07": 282
+      }
+    },
+    "MINERAL": {
+      "count": 819,
+      "sources": {
+        "USGS_SPLIB07": 819
+      }
+    },
+    "MIXTURE": {
+      "count": 12,
+      "sources": {
+        "USGS_SPLIB07": 12
+      }
+    },
+    "ORGANIC": {
+      "count": 300,
+      "sources": {
+        "USGS_SPLIB07": 300
+      }
+    },
+    "SOIL": {
+      "count": 152,
+      "sources": {
+        "USGS_SPLIB07": 152
+      }
+    },
+    "VEGETATION": {
+      "count": 247,
+      "sources": {
+        "USGS_SPLIB07": 247
+      }
+    },
+    "WATER": {
+      "count": 24,
+      "sources": {
+        "USGS_SPLIB07": 24
+      }
     }
   },
-  "total": 136
+  "total": 1972
 }

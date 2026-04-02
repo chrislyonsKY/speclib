@@ -29,6 +29,33 @@ logger = logging.getLogger(__name__)
 
 USGS_DELETE_VALUE = -1.23e34
 
+# Spectrometer code mapping: filename substring → wavelength file keyword
+_SPECTROMETER_MAP = {
+    "ASDFR": "ASD",
+    "ASDHR": "ASD",
+    "ASDNG": "ASD",
+    "ASDFRb": "ASD",
+    "ASDHRb": "ASD",
+    "ASDNGb": "ASD",
+    "BECK": "BECK",
+    "BECKa": "BECK",
+    "BECKb": "BECK",
+    "NIC4": "NIC4",
+    "NIC4bbb": "NIC4",
+    "AVIRIS": "AVIRIS",
+}
+
+# Chapter directory name → MaterialCategory value
+_CHAPTER_DIR_MAP = {
+    "ChapterM_Minerals": "MINERAL",
+    "ChapterS_SoilsAndMixtures": "SOIL",
+    "ChapterC_Coatings": "MIXTURE",
+    "ChapterL_Liquids": "WATER",
+    "ChapterO_OrganicCompounds": "ORGANIC",
+    "ChapterA_ArtificialMaterials": "MANMADE",
+    "ChapterV_Vegetation": "VEGETATION",
+}
+
 
 class UsgsAdapter(BaseAdapter):
     """Ingestion adapter for the USGS Spectral Library v7 (splib07a).
@@ -36,6 +63,15 @@ class UsgsAdapter(BaseAdapter):
     Reads ASCII data files with separate wavelength files. Handles
     the USGS delete value convention and chapter-based organization.
     """
+
+    def __init__(self, config_path: Path) -> None:
+        """Initialize and cache wavelength files.
+
+        Args:
+            config_path: Path to YAML config.
+        """
+        super().__init__(config_path)
+        self._wavelength_cache: dict[str, np.ndarray] = {}
 
     def discover(self) -> list[SourceRecord]:
         """List available spectra from the ASCII data directory.
@@ -53,28 +89,27 @@ class UsgsAdapter(BaseAdapter):
             logger.warning("ASCII data directory not found: %s", data_path)
             return []
 
-        chapter_map = self.config.get("chapter_map", {})
         records: list[SourceRecord] = []
 
-        for txt_path in sorted(data_path.rglob("*.txt")):
-            if txt_path.name.startswith("splib07a_Wavelengths"):
+        for chapter_dir in sorted(data_path.iterdir()):
+            if not chapter_dir.is_dir() or chapter_dir.name.startswith("error"):
                 continue
 
-            stem = txt_path.stem
-            chapter = _extract_chapter(stem, txt_path)
-            category = chapter_map.get(chapter, "MINERAL")
+            category = _CHAPTER_DIR_MAP.get(chapter_dir.name, "MINERAL")
 
-            records.append(
-                SourceRecord(
-                    record_id=str(txt_path),
-                    name=stem,
-                    category=category,
-                    metadata={
-                        "chapter": chapter,
-                        "relative_path": str(txt_path.relative_to(data_path)),
-                    },
+            for txt_path in sorted(chapter_dir.glob("*.txt")):
+                stem = txt_path.stem
+                records.append(
+                    SourceRecord(
+                        record_id=str(txt_path),
+                        name=_parse_spectrum_name(stem),
+                        category=category,
+                        metadata={
+                            "chapter_dir": chapter_dir.name,
+                            "filename": txt_path.name,
+                        },
+                    )
                 )
-            )
 
         logger.info("Discovered %d USGS spectra", len(records))
         return records
@@ -89,22 +124,28 @@ class UsgsAdapter(BaseAdapter):
             RawSpectrum with wavelengths (um) and reflectance (0-1).
         """
         refl_path = Path(record_id)
-        wavelength_path = _find_wavelength_file(refl_path)
 
-        wavelengths = _read_usgs_column(wavelength_path)
-        reflectance = _read_usgs_column(refl_path)
+        # Read reflectance (skip header line)
+        reflectance = _read_usgs_data(refl_path)
 
-        # Truncate to shorter array if lengths differ
+        # Find and read matching wavelength file
+        spectrometer = _extract_spectrometer(refl_path.stem)
+        wavelengths = self._get_wavelengths(refl_path, spectrometer)
+
+        # Truncate to shorter array
         min_len = min(len(wavelengths), len(reflectance))
         wavelengths = wavelengths[:min_len]
         reflectance = reflectance[:min_len]
 
         # Replace USGS delete values with NaN
-        delete_mask = np.isclose(reflectance, USGS_DELETE_VALUE, rtol=1e-3)
+        delete_mask = np.abs(reflectance) > 1.0e30
         reflectance[delete_mask] = np.nan
 
-        wl_delete = np.isclose(wavelengths, USGS_DELETE_VALUE, rtol=1e-3)
+        wl_delete = np.abs(wavelengths) > 1.0e30
         wavelengths[wl_delete] = np.nan
+
+        # Parse header for record info
+        header = _read_header(refl_path)
 
         return RawSpectrum(
             record_id=record_id,
@@ -112,7 +153,11 @@ class UsgsAdapter(BaseAdapter):
             reflectance=reflectance,
             wavelength_unit="um",
             reflectance_scale="fractional",
-            metadata={"source_file": refl_path.name},
+            metadata={
+                "source_file": refl_path.name,
+                "header": header,
+                "spectrometer": spectrometer,
+            },
         )
 
     def normalize(self, raw: RawSpectrum) -> Spectrum:
@@ -125,35 +170,61 @@ class UsgsAdapter(BaseAdapter):
             Normalized Spectrum (already in um/0-1).
         """
         refl_path = Path(raw.record_id)
-        chapter = _extract_chapter(refl_path.stem, refl_path)
-        chapter_map = self.config.get("chapter_map", {})
-        category_str = chapter_map.get(chapter, "MINERAL")
+        chapter_dir = refl_path.parent.name
+        category_str = _CHAPTER_DIR_MAP.get(chapter_dir, "MINERAL")
         category = MaterialCategory(category_str)
 
+        name = _parse_spectrum_name(refl_path.stem)
+        header = raw.metadata.get("header", "")
+
         metadata = SampleMetadata(
-            material_name=refl_path.stem,
+            material_name=name,
             material_category=category,
             source_library=SourceLibrary.USGS_SPLIB07,
             source_record_id=refl_path.stem,
             measurement_type=MeasurementType.LABORATORY,
             license=self.config.get("license", "US Public Domain"),
+            instrument=raw.metadata.get("spectrometer", ""),
             citation=self.config.get("citation", ""),
+            description=header,
             source_filename=refl_path.name,
         )
 
         return Spectrum(
-            name=refl_path.stem,
+            name=name,
             wavelengths=raw.wavelengths,
             reflectance=raw.reflectance,
             metadata=metadata,
             quality=QualityFlag.GOOD,
         )
 
+    def _get_wavelengths(self, refl_path: Path, spectrometer: str) -> np.ndarray:
+        """Get cached wavelength array for a spectrometer type.
 
-def _read_usgs_column(path: Path) -> np.ndarray:
-    """Read a single-column USGS ASCII data file.
+        Args:
+            refl_path: Path to the reflectance file (for locating wavelength files).
+            spectrometer: Spectrometer keyword (ASD, BECK, NIC4, AVIRIS).
 
-    Skips header lines that don't parse as floats.
+        Returns:
+            Wavelength array in micrometers.
+        """
+        if spectrometer in self._wavelength_cache:
+            return self._wavelength_cache[spectrometer].copy()
+
+        wl_file = _find_wavelength_file(refl_path, spectrometer)
+        wavelengths = _read_usgs_data(wl_file)
+        self._wavelength_cache[spectrometer] = wavelengths
+        logger.info(
+            "Cached %d wavelengths for %s from %s",
+            len(wavelengths),
+            spectrometer,
+            wl_file.name,
+        )
+        return wavelengths.copy()
+
+
+def _read_usgs_data(path: Path) -> np.ndarray:
+    """Read a USGS ASCII data file, skipping the header line.
 
     Args:
         path: Path to the data file.
@@ -163,9 +234,12 @@ def _read_usgs_column(path: Path) -> np.ndarray:
     """
     values: list[float] = []
     with path.open() as f:
-        for line in f:
+        for i, line in enumerate(f):
             line = line.strip()
             if not line:
+                continue
+            # Skip header line (contains non-numeric text)
+            if i == 0 and not _is_numeric(line):
                 continue
             try:
                 values.append(float(line))
@@ -174,14 +248,34 @@ def _read_usgs_column(path: Path) -> np.ndarray:
     return np.array(values, dtype=np.float64)
 
 
-def _find_wavelength_file(refl_path: Path) -> Path:
-    """Locate the wavelength file for a given reflectance file.
+def _read_header(path: Path) -> str:
+    """Read the first line of a USGS file as the header/title.
 
-    USGS convention: wavelength files are in a parent directory or
-    sibling directory named with 'Wavelengths'.
+    Args:
+        path: Path to the data file.
+
+    Returns:
+        Header string.
+    """
+    with path.open() as f:
+        return f.readline().strip()
+
+
+def _is_numeric(s: str) -> bool:
+    """Check if a string is a numeric value."""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def _find_wavelength_file(refl_path: Path, spectrometer: str) -> Path:
+    """Locate the wavelength file matching a spectrometer type.
 
     Args:
         refl_path: Path to the reflectance data file.
+        spectrometer: Spectrometer keyword (ASD, BECK, NIC4, AVIRIS).
 
     Returns:
         Path to the matching wavelength file.
@@ -189,34 +283,60 @@ def _find_wavelength_file(refl_path: Path) -> Path:
     Raises:
         FileNotFoundError: If no wavelength file is found.
     """
-    # Search in same directory and parent directories
-    for search_dir in [refl_path.parent, refl_path.parent.parent, refl_path.parent.parent.parent]:
+    # Wavelength files are in the parent of the chapter directories
+    for search_dir in [
+        refl_path.parent.parent,
+        refl_path.parent,
+        refl_path.parent.parent.parent,
+    ]:
+        if not search_dir.exists():
+            continue
+        for wl_file in search_dir.glob("*Wavelengths*.txt"):
+            if spectrometer in wl_file.name:
+                return wl_file
+
+    # Fallback: any wavelength file
+    for search_dir in [refl_path.parent.parent, refl_path.parent]:
+        if not search_dir.exists():
+            continue
         for wl_file in search_dir.glob("*Wavelengths*.txt"):
             return wl_file
 
-    msg = f"No wavelength file found for {refl_path}"
+    msg = f"No wavelength file found for {refl_path} (spectrometer: {spectrometer})"
     raise FileNotFoundError(msg)
 
 
-def _extract_chapter(stem: str, path: Path) -> str:
-    """Extract the USGS chapter code from a filename or path.
+def _extract_spectrometer(stem: str) -> str:
+    """Extract the spectrometer type from a USGS filename.
 
     Args:
         stem: Filename without extension.
-        path: Full file path.
 
     Returns:
-        Chapter string like 'Ch01', or empty string if not found.
+        Spectrometer keyword (ASD, BECK, NIC4, AVIRIS).
     """
-    # Try filename pattern
-    match = re.search(r"Ch(\d{2})", stem)
-    if match:
-        return f"Ch{match.group(1)}"
+    # Try known codes from longest to shortest
+    for code, keyword in sorted(_SPECTROMETER_MAP.items(), key=lambda x: -len(x[0])):
+        if code in stem:
+            return keyword
+    return "ASD"  # default
 
-    # Try parent directory names
-    for part in path.parts:
-        match = re.search(r"Ch(\d{2})", part)
-        if match:
-            return f"Ch{match.group(1)}"
 
-    return ""
+def _parse_spectrum_name(stem: str) -> str:
+    """Parse a human-readable name from a USGS filename.
+
+    Converts 'splib07a_Acmite_NMNH133746_Pyroxene_BECKa_AREF'
+    to 'Acmite NMNH133746 Pyroxene'.
+
+    Args:
+        stem: Filename without extension.
+
+    Returns:
+        Cleaned spectrum name.
+    """
+    # Remove prefix
+    name = re.sub(r"^splib07[ab]_", "", stem)
+    # Remove spectrometer and reference type suffixes
+    name = re.sub(r"_(ASDFR|ASDHR|ASDNG|BECK|NIC4|AVIRIS)\w*$", "", name)
+    name = re.sub(r"_(AREF|RREF)$", "", name)
+    return name.replace("_", " ")
