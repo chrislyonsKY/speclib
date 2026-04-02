@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Ruff
+.ruff_cache/
+
+# Spectral data files (large, not committed)
+*.h5
+*.hdf5
+*.parquet
+*.specpr
+*.sli
+*.esl
+*.hdr
+
+# Upstream source distributions (download locally, not committed)
+data/upstream/downloads/
+data/cache/
+
+# Built static site data (regenerable)
+web/static/data/*.json
+web/static/data/spectra/
+
+# Config files with local paths
+config.yaml
+config.local.yaml
+
+# AI dev infrastructure — reference manually, do not auto-index
+# ai-dev/ is committed to version control but excluded from AI auto-scanning.
+# Remove the comment below only if you want to fully exclude it from git as well.
+# ai-dev/

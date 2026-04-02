@@ -1,0 +1,1 @@
+"""speclib.resample module."""

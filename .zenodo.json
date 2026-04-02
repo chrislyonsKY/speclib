@@ -1,0 +1,38 @@
+{
+  "title": "speclib: Federated Spectral Signature Library",
+  "description": "A federated spectral signature library platform aggregating reflectance spectra from USGS Spectral Library v7, ECOSTRESS, ASTER/JPL, and EMIT L2B, with Kentucky-focused collections including invasive species spectral data.",
+  "creators": [
+    {
+      "name": "Lyons, Chris",
+      "affiliation": "Commonwealth of Kentucky",
+      "orcid": ""
+    }
+  ],
+  "license": {
+    "id": "GPL-3.0-only"
+  },
+  "keywords": [
+    "spectroscopy",
+    "spectral library",
+    "remote sensing",
+    "reflectance",
+    "USGS",
+    "ECOSTRESS",
+    "ASTER",
+    "EMIT",
+    "hyperspectral",
+    "minerals",
+    "vegetation",
+    "Kentucky",
+    "invasive species"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/chrislyonsKY/speclib",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "upload_type": "software",
+  "access_right": "open"
+}

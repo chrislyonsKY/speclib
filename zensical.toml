@@ -1,0 +1,75 @@
+[project]
+site_name = "speclib"
+site_description = "Federated spectral signature library with Kentucky-focused collections"
+site_author = "Chris Lyons"
+site_url = "https://chrislyonsKY.github.io/speclib/"
+copyright = "Copyright &copy; 2026 Chris Lyons — GPL-3.0-only"
+repo_url = "https://github.com/chrislyonsKY/speclib"
+repo_name = "chrislyonsKY/speclib"
+
+[theme]
+name = "material"
+language = "en"
+
+  [theme.palette]
+  scheme = "slate"
+  primary = "teal"
+  accent = "amber"
+
+  [theme.font]
+  text = "Inter"
+  code = "JetBrains Mono"
+
+  [theme.icon]
+  repo = "fontawesome/brands/github"
+
+[theme.features]
+navigation_instant = true
+navigation_tabs = true
+navigation_sections = true
+navigation_expand = false
+navigation_top = true
+search_suggest = true
+search_highlight = true
+content_tabs_link = true
+content_code_copy = true
+
+[extra]
+
+  [[extra.social]]
+  icon = "fontawesome/brands/github"
+  link = "https://github.com/chrislyonsKY/speclib"
+
+[extra_css]
+files = ["stylesheets/extra.css"]
+
+[[nav]]
+title = "Home"
+path = "index.md"
+
+[[nav]]
+title = "Getting Started"
+path = "getting-started.md"
+
+[[nav]]
+title = "User Guide"
+children = [
+  { title = "Installation", path = "guide/installation.md" },
+  { title = "Spectral Data Model", path = "guide/data-model.md" },
+  { title = "Ingestion", path = "guide/ingestion.md" },
+  { title = "Export Formats", path = "guide/export.md" },
+  { title = "Resampling", path = "guide/resampling.md" },
+  { title = "CLI Reference", path = "guide/cli.md" },
+]
+
+[[nav]]
+title = "API Reference"
+path = "api/index.md"
+
+[[nav]]
+title = "Kentucky Chapter"
+path = "kentucky.md"
+
+[[nav]]
+title = "Contributing"
+path = "contributing.md"

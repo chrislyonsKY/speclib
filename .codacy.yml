@@ -1,0 +1,17 @@
+---
+engines:
+  ruff:
+    enabled: true
+  pylint:
+    enabled: false
+  bandit:
+    enabled: true
+
+exclude_paths:
+  - "data/**"
+  - "docs/**"
+  - "build/**"
+  - "web/static/data/**"
+  - "ai-dev/**"
+  - "**/*.h5"
+  - "**/*.parquet"

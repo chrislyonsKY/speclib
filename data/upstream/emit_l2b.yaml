@@ -1,0 +1,11 @@
+# EMIT L2B Mineral Identification — Ingestion Config
+source: EMIT_L2B
+version: "L2B"
+citation: >
+  Green, R.O., et al. (2022). The Earth Surface Mineral Dust Source
+  Investigation (EMIT). NASA/JPL.
+license: "NASA Open Data"
+data_url: "https://earth.jpl.nasa.gov/emit/data/data-portal/"
+granule_dir: null
+min_band_depth: 0.02
+min_fit_score: 0.1

@@ -1,0 +1,10 @@
+# ECOSTRESS Spectral Library — Ingestion Config
+source: ECOSTRESS
+version: "1.0"
+citation: >
+  Meerdink, S.K., Hook, S.J., Roberts, D.A., & Abbott, E.A. (2019).
+  The ECOSTRESS spectral library version 1.0.
+  Remote Sensing of Environment, 230, 111196.
+license: "CC0 / Public Domain"
+data_url: "https://speclib.jpl.nasa.gov/"
+data_dir: null  # e.g., ~/data/ecostress/

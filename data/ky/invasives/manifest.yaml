@@ -1,0 +1,15 @@
+# Kentucky Invasive Species Spectral Data — Seed Manifest
+source: KY_FIELD
+citation: >
+  Lyons, C., et al. (2024). International Journal of Remote Sensing.
+license: "CC-BY-4.0"
+crs: "EPSG:3089"
+species:
+  - common_name: "Amur honeysuckle"
+    binomial: "Lonicera maackii"
+    category: KY_INVASIVE
+    measurement_type: FIELD
+  - common_name: "Callery pear"
+    binomial: "Pyrus calleryana"
+    category: KY_INVASIVE
+    measurement_type: FIELD

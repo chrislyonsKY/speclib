@@ -1,0 +1,10 @@
+# ASTER/JPL Spectral Library — Ingestion Config
+source: ASTER_JPL
+version: "2.0"
+citation: >
+  Baldridge, A.M., Hook, S.J., Grove, C.I., & Rivera, G. (2009).
+  The ASTER spectral library version 2.0.
+  Remote Sensing of Environment, 113(4), 711-715.
+license: "NASA Open Data"
+data_url: "https://speclib.jpl.nasa.gov/"
+data_dir: null

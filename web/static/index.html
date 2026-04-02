@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>speclib — Spectral Signature Library</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>speclib</h1>
+        <p>Federated Spectral Signature Library</p>
+    </header>
+    <main>
+        <section id="search">
+            <input type="text" id="search-input" placeholder="Search spectra (e.g., quartz, honeysuckle)...">
+            <div id="filters">
+                <!-- TODO: Category, source, quality filter dropdowns -->
+            </div>
+        </section>
+        <section id="results">
+            <!-- TODO: Spectrum catalog table -->
+        </section>
+        <section id="viewer">
+            <div id="spectral-chart">
+                <!-- TODO: D3.js spectral plot container -->
+            </div>
+            <div id="metadata-panel">
+                <!-- TODO: Sample metadata display -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Data sources: USGS splib07, ECOSTRESS, ASTER/JPL, EMIT L2B</p>
+        <p><a href="https://github.com/chrislyonsKY/speclib">GitHub</a> · GPL-3.0</p>
+    </footer>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/spectral-chart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

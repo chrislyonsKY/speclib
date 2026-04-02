@@ -1,0 +1,15 @@
+name: "Sentinel-2 MSI"
+sensor_id: "S2_MSI"
+response_type: gaussian
+channels:
+  - { band: 1, name: "Coastal", center_wavelength: 0.443, fwhm: 0.020 }
+  - { band: 2, name: "Blue", center_wavelength: 0.490, fwhm: 0.065 }
+  - { band: 3, name: "Green", center_wavelength: 0.560, fwhm: 0.035 }
+  - { band: 4, name: "Red", center_wavelength: 0.665, fwhm: 0.030 }
+  - { band: 5, name: "Red Edge 1", center_wavelength: 0.705, fwhm: 0.015 }
+  - { band: 6, name: "Red Edge 2", center_wavelength: 0.740, fwhm: 0.015 }
+  - { band: 7, name: "Red Edge 3", center_wavelength: 0.783, fwhm: 0.020 }
+  - { band: 8, name: "NIR", center_wavelength: 0.842, fwhm: 0.115 }
+  - { band: 8A, name: "NIR Narrow", center_wavelength: 0.865, fwhm: 0.020 }
+  - { band: 11, name: "SWIR1", center_wavelength: 1.610, fwhm: 0.090 }
+  - { band: 12, name: "SWIR2", center_wavelength: 2.190, fwhm: 0.180 }

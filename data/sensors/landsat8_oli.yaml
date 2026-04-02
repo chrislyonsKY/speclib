@@ -1,0 +1,11 @@
+name: "Landsat 8 OLI"
+sensor_id: "L8_OLI"
+response_type: gaussian
+channels:
+  - { band: 1, name: "Coastal/Aerosol", center_wavelength: 0.443, fwhm: 0.016 }
+  - { band: 2, name: "Blue", center_wavelength: 0.482, fwhm: 0.060 }
+  - { band: 3, name: "Green", center_wavelength: 0.562, fwhm: 0.057 }
+  - { band: 4, name: "Red", center_wavelength: 0.655, fwhm: 0.037 }
+  - { band: 5, name: "NIR", center_wavelength: 0.865, fwhm: 0.028 }
+  - { band: 6, name: "SWIR1", center_wavelength: 1.609, fwhm: 0.085 }
+  - { band: 7, name: "SWIR2", center_wavelength: 2.201, fwhm: 0.187 }

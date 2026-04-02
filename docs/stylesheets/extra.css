@@ -1,0 +1,18 @@
+/* speclib — custom overrides for Zensical Material theme */
+
+:root {
+  --md-primary-fg-color: #00897b;
+  --md-accent-fg-color: #ffb300;
+}
+
+/* Data-first aesthetic inspired by USGS publications */
+.md-typeset table:not([class]) {
+  font-size: 0.82rem;
+}
+
+.md-typeset table:not([class]) th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}

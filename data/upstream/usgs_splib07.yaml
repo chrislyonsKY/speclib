@@ -1,0 +1,28 @@
+# USGS Spectral Library Version 7 — Ingestion Config
+source: USGS_SPLIB07
+version: "7"
+citation: >
+  Kokaly, R.F., Clark, R.N., Swayze, G.A., Livo, K.E., Hoefen, T.M.,
+  Pearson, N.C., Wise, R.A., Benzel, W.M., Lowers, H.A., Driscoll, R.L.,
+  and Klein, A.J., 2017, USGS Spectral Library Version 7:
+  U.S. Geological Survey Data Series 1035, 61 p.,
+  https://doi.org/10.3133/ds1035.
+license: "US Public Domain"
+data_url: "https://dx.doi.org/10.5066/F7RR1WDJ"
+
+# Local paths (user must download and configure)
+ascii_data_dir: null  # e.g., ~/data/usgs/ASCIIdata_splib07a
+specpr_file: null      # e.g., ~/data/usgs/splib07a
+
+# Chapter mapping to speclib MaterialCategory
+chapter_map:
+  Ch01: MINERAL
+  Ch02: MIXTURE
+  Ch03: ROCK
+  Ch04: SOIL
+  Ch05: VEGETATION
+  Ch06: VEGETATION_PLOT
+  Ch07: MANMADE
+  Ch08: VOLATILE
+  Ch09: WATER
+  Ch10: ORGANIC
