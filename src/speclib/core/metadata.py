@@ -6,8 +6,10 @@ with provenance tracking for federated ingestion.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import UTC, date, datetime
+from enum import Enum
 from typing import Any
 
 from speclib.core.spectrum import MaterialCategory, MeasurementType, SourceLibrary
@@ -57,7 +59,7 @@ class SampleMetadata:
     geometry_ky_wkt: str | None = None  # EPSG:3089
 
     # Auto-populated by ingestion
-    ingested_at: datetime = field(default_factory=datetime.utcnow)
+    ingested_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     adapter_version: str = "0.1.0"
 
     # Extensible metadata bag for source-specific fields
@@ -69,11 +71,19 @@ class SampleMetadata:
         Returns:
             Dictionary with all metadata fields serialized as strings.
         """
-        # TODO: Implement serialization
-        # TODO: Handle None values (store as empty string for HDF5 compat)
-        # TODO: Handle date/datetime as ISO 8601 strings
-        # TODO: Handle enums as their .value strings
-        raise NotImplementedError
+        result: dict[str, Any] = {}
+        for key, value in self.__dict__.items():
+            if key == "extra":
+                result["extra"] = json.dumps(value) if value else "{}"
+            elif isinstance(value, Enum):
+                result[key] = value.value
+            elif isinstance(value, (datetime, date)):
+                result[key] = value.isoformat()
+            elif value is None:
+                result[key] = ""
+            else:
+                result[key] = str(value)
+        return result
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> SampleMetadata:
@@ -85,7 +95,50 @@ class SampleMetadata:
         Returns:
             Populated SampleMetadata instance.
         """
-        # TODO: Implement deserialization
-        # TODO: Parse date strings back to date objects
-        # TODO: Parse enum value strings back to enum instances
-        raise NotImplementedError
+        kwargs: dict[str, Any] = {}
+
+        kwargs["material_name"] = str(data.get("material_name", ""))
+        kwargs["material_category"] = MaterialCategory(data["material_category"])
+        kwargs["source_library"] = SourceLibrary(data["source_library"])
+        kwargs["source_record_id"] = str(data.get("source_record_id", ""))
+        kwargs["measurement_type"] = MeasurementType(data["measurement_type"])
+        kwargs["license"] = str(data.get("license", ""))
+
+        # Optional string fields
+        for key in (
+            "material_subcategory",
+            "formula",
+            "instrument",
+            "grain_size",
+            "purity",
+            "description",
+            "locality",
+            "citation",
+            "xrd_results",
+            "em_results",
+            "source_filename",
+            "adapter_version",
+        ):
+            if data.get(key):
+                kwargs[key] = str(data[key])
+
+        # Date fields
+        date_str = data.get("measurement_date", "")
+        if date_str:
+            kwargs["measurement_date"] = date.fromisoformat(str(date_str))
+
+        ingested_str = data.get("ingested_at", "")
+        if ingested_str:
+            kwargs["ingested_at"] = datetime.fromisoformat(str(ingested_str))
+
+        # Spatial fields
+        for key in ("geometry_wkt", "geometry_ky_wkt"):
+            val = data.get(key, "")
+            kwargs[key] = str(val) if val else None
+
+        # Extra bag
+        extra_str = data.get("extra", "{}")
+        if extra_str:
+            kwargs["extra"] = json.loads(str(extra_str))
+
+        return cls(**kwargs)

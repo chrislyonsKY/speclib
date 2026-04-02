@@ -1,25 +1,21 @@
-"""ASTER spectral library ingestion adapter.
+"""ASTER/JPL spectral library ingestion adapter.
 
-TODO: Implement discover/fetch/normalize for ASTER source.
+Thin wrapper around EcostressAdapter since ASTER and ECOSTRESS
+share nearly identical file formats. Differences are handled
+by the source config (license, citation, source library enum).
+
+Reference: Baldridge et al. (2009), Remote Sensing of Environment.
 """
 
 from __future__ import annotations
 
-from speclib.core.spectrum import Spectrum
-from speclib.ingest.base import BaseAdapter, RawSpectrum, SourceRecord
+from speclib.ingest.ecostress import EcostressAdapter
 
 
-class AsterAdapter(BaseAdapter):
-    """Ingestion adapter for the ASTER spectral library."""
+class AsterAdapter(EcostressAdapter):
+    """Ingestion adapter for the ASTER/JPL spectral library.
 
-    def discover(self) -> list[SourceRecord]:
-        """List available spectra from ASTER source."""
-        raise NotImplementedError
-
-    def fetch(self, record_id: str) -> RawSpectrum:
-        """Retrieve a single raw spectrum from ASTER."""
-        raise NotImplementedError
-
-    def normalize(self, raw: RawSpectrum) -> Spectrum:
-        """Convert ASTER format to internal Spectrum model."""
-        raise NotImplementedError
+    Uses the same parsing logic as EcostressAdapter. The source
+    library, license, and citation are determined from the YAML
+    config file (data/upstream/aster_jpl.yaml).
+    """

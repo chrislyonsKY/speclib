@@ -4,12 +4,16 @@ citation: >
   Lyons, C., et al. (2024). International Journal of Remote Sensing.
 license: "CC-BY-4.0"
 crs: "EPSG:3089"
+instrument: "CID CI-710 (Ocean Optics USB4000)"
+instrument_range_nm: [400, 950]
 species:
   - common_name: "Amur honeysuckle"
     binomial: "Lonicera maackii"
     category: KY_INVASIVE
     measurement_type: FIELD
+    sites: ["shelby", "raven"]
   - common_name: "Callery pear"
     binomial: "Pyrus calleryana"
     category: KY_INVASIVE
     measurement_type: FIELD
+    sites: ["bernheim"]

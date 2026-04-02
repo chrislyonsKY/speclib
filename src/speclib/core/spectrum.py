@@ -93,12 +93,44 @@ class Spectrum:
 
     def __post_init__(self) -> None:
         """Validate spectral data integrity and generate ID if needed."""
-        # TODO: Validate wavelengths sorted ascending
-        # TODO: Validate wavelengths and reflectance same length
-        # TODO: Validate reflectance values, flag out-of-range (don't clip)
-        # TODO: Validate errors array shape if present
-        # TODO: Generate spectrum_id if empty
-        pass
+        if len(self.wavelengths) != len(self.reflectance):
+            msg = (
+                f"Wavelength ({len(self.wavelengths)}) and reflectance "
+                f"({len(self.reflectance)}) arrays must be the same length"
+            )
+            raise ValueError(msg)
+
+        finite_wl = self.wavelengths[np.isfinite(self.wavelengths)]
+        if len(finite_wl) > 1 and not np.all(np.diff(finite_wl) >= 0):
+            msg = "Wavelengths must be sorted ascending"
+            raise ValueError(msg)
+
+        finite_refl = self.reflectance[np.isfinite(self.reflectance)]
+        if len(finite_refl) > 0:
+            out_of_range = (finite_refl < 0.0) | (finite_refl > 1.0)
+            if np.any(out_of_range):
+                n_bad = int(np.sum(out_of_range))
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    "%s: %d reflectance values outside [0.0, 1.0]",
+                    self.name,
+                    n_bad,
+                )
+
+        if self.errors is not None and self.errors.shape != self.wavelengths.shape:
+            msg = (
+                f"Errors shape {self.errors.shape} must match wavelengths {self.wavelengths.shape}"
+            )
+            raise ValueError(msg)
+
+        if not self.spectrum_id:
+            meta = self.metadata
+            source = getattr(meta, "source_library", None)
+            source = source.value if source else "unknown"
+            cat = getattr(meta, "material_category", None)
+            cat = cat.value if cat else "unknown"
+            self.spectrum_id = self._generate_id(source, cat, self.name)
 
     @property
     def n_bands(self) -> int:
