@@ -421,13 +421,18 @@ const SL = (() => {
   return { init };
 })();
 
-// Initialize when DOM is ready (works with Zensical instant navigation)
+// Initialize: try multiple strategies since load timing varies
 if (typeof document$ !== "undefined") {
+  // Zensical instant navigation
   document$.subscribe(() => {
     if (document.getElementById("sl-chart")) SL.init();
   });
-} else {
+} else if (document.readyState === "loading") {
+  // Script loaded before DOM ready
   document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("sl-chart")) SL.init();
   });
+} else {
+  // DOM already ready (script loaded at end of page)
+  if (document.getElementById("sl-chart")) SL.init();
 }
