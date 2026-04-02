@@ -3,6 +3,7 @@
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11%2B-informational)
 ![Status](https://img.shields.io/badge/status-1.0.0-green)
+[![PyPI](https://img.shields.io/pypi/v/speclib?logo=pypi&logoColor=white)](https://pypi.org/project/speclib/)
 [![CI](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml/badge.svg)](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/1199662773.svg)](https://doi.org/10.5281/zenodo.19390678)
 [![codecov](https://codecov.io/gh/chrislyonsKY/speclib/graph/badge.svg)](https://codecov.io/gh/chrislyonsKY/speclib)
