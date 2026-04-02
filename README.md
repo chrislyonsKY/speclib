@@ -6,7 +6,7 @@
 [![CI](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml/badge.svg)](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://zenodo.org/doi/10.5281/zenodo.XXXXXXX)
 [![codecov](https://codecov.io/gh/chrislyonsKY/speclib/graph/badge.svg)](https://codecov.io/gh/chrislyonsKY/speclib)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/PLACEHOLDER)](https://app.codacy.com/gh/chrislyonsKY/speclib/dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f45422a205bb46ff9955f01622d2d6ab)](https://app.codacy.com/gh/chrislyonsKY/speclib/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![NumPy](https://img.shields.io/badge/numpy-%E2%89%A51.26-013243?logo=numpy)
 ![HDF5](https://img.shields.io/badge/HDF5-h5py%20%E2%89%A53.10-blue)
 ![Parquet](https://img.shields.io/badge/parquet-pyarrow%20%E2%89%A515.0-blue)
