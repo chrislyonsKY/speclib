@@ -55,3 +55,4 @@ Search, compare, and download reflectance spectra from federated sources.
 </div>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../js/spectral-viewer.js"></script>
