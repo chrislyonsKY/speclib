@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "speclib"
-version = "0.1.0"
+version = "1.0.0"
 description = "Federated spectral signature library with Kentucky-focused collections"
 readme = "README.md"
 license = "GPL-3.0-only"
@@ -23,7 +23,7 @@ keywords = [
     "hyperspectral",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",

@@ -7,24 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-### Changed
-### Deprecated
-### Removed
-### Fixed
-### Security
-
-## [0.1.0] - TBD
+## [1.0.0] - 2026-04-02
 
 ### Added
-- Initial project scaffold
-- Core data model (Spectrum, SampleMetadata, QualityFlag, MaterialCategory)
-- Ingestion adapter framework with USGS, ECOSTRESS, ASTER, EMIT adapters
-- HDF5 archival storage backend
-- Parquet query layer with build pipeline
-- Export formats: .esl, .sli, SPECPR, ASCII, JSON
-- Spectral resampling engine with Landsat 8 and Sentinel-2 profiles
-- CLI interface (ingest, search, export, resample, build, serve)
-- Static web viewer with D3.js spectral charts
-- Optional FastAPI server with REST API
-- Kentucky invasive species seed data (Lyons et al. 2024)
+
+- Core data model: Spectrum, SampleMetadata, QualityFlag, MaterialCategory, SourceLibrary
+- Ingestion adapters for USGS splib07a (ASCII), ECOSTRESS, ASTER/JPL, and Kentucky field data
+- KY Field adapter for CID CI-710 leaf spectrometer (SpectraSnap! CSV format)
+- USGS adapter with spectrometer-aware wavelength file matching (ASD, Beckman, Nicolet)
+- HDF5 archival storage backend with gzip-4 compression
+- Parquet query layer with catalog and per-category spectral data
+- Static JSON build pipeline (catalog.json, taxonomy.json, spectra/*.json)
+- D3.js spectral library browser integrated into Zensical docs site
+- Interactive spectral chart with zoom, pan, crosshair readout, multi-spectra overlay
+- Researcher contribution workflow via GitHub PRs with CI validation
+- Three-tier quality system: VERIFIED, CURATED, COMMUNITY
+- Quality Standards documentation
+- Contribution template directory with example CSV and YAML manifest
+- CI pipeline: ruff lint + pytest across 3 OS x 3 Python versions
+- Codecov coverage reporting and Codacy code quality analysis
+- Zenodo DOI integration and CITATION.cff
+- Zensical documentation site with 10+ pages deployed to GitHub Pages
+- 1,972 spectra from USGS splib07a (2,418 spectra) and KY field data (270 spectra)
+- Kentucky invasive species seed data: Amur honeysuckle (Lonicera maackii) from
+  Shelby Trails and Raven Run sites (Lyons et al. 2024)

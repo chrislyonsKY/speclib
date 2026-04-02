@@ -10,7 +10,7 @@ authors:
 repository-code: "https://github.com/chrislyonsKY/speclib"
 url: "https://chrislyonsKY.github.io/speclib/"
 license: GPL-3.0-only
-version: 0.1.0
+version: 1.0.0
 date-released: "2026-04-02"
 keywords:
   - spectroscopy

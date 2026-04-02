@@ -4,7 +4,7 @@ A platform for aggregating, searching, and distributing reflectance
 spectra from major public repositories with Kentucky-focused collections.
 """
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 from speclib.core.spectrum import (
     MaterialCategory,
