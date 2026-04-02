@@ -14,17 +14,19 @@ const SL = (() => {
 
   const MAX_OVERLAY = 6;
   const LINE_CLASSES = ["sl-line-0", "sl-line-1", "sl-line-2", "sl-line-3", "sl-line-4", "sl-line-5"];
-  // Resolve data URL relative to the site root
-  const SITE_ROOT = (function () {
-    const base = document.querySelector('link[rel="canonical"]');
-    if (base) return base.href.replace(/[^/]*$/, "");
-    // Fallback: derive from current page URL
-    const path = window.location.pathname;
-    const idx = path.indexOf("/speclib/");
-    if (idx >= 0) return window.location.origin + path.slice(0, idx) + "/speclib/";
-    return window.location.origin + "/";
+  // Resolve data URL: find the site root from the __config base path
+  const DATA_URL = (function () {
+    const cfg = document.getElementById("__config");
+    if (cfg) {
+      try {
+        const base = JSON.parse(cfg.textContent).base;
+        return base + "/data/";
+      } catch { /* fall through */ }
+    }
+    // Fallback: navigate up from /library/ to site root
+    const path = window.location.pathname.replace(/\/library\/?$/, "/");
+    return window.location.origin + path + "data/";
   })();
-  const DATA_URL = SITE_ROOT + "data/";
 
   let catalog = null;
   let filtered = [];
