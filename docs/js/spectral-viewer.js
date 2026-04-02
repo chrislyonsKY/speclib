@@ -223,7 +223,7 @@ const SL = (() => {
         <span class="sl-meta-label">License</span><span class="sl-meta-value">${s.license || "\u2014"}</span>
       </div>
       <div style="margin-top:0.75rem">
-        <a href="data/spectra/${s.id}.json" download style="font-size:0.78rem">Download JSON</a>
+        <a href="${DATA_URL}spectra/${s.id}.json" download style="font-size:0.78rem">Download JSON</a>
       </div>
     `;
   }
@@ -358,19 +358,18 @@ const SL = (() => {
     svg.select(".sl-grid").call(d3.axisLeft(yScale).ticks(5).tickSize(-(width - margin.left - margin.right)).tickFormat(""));
 
     // Draw lines
-    const line = d3.line()
-      .x((d, i) => xScale(loaded[0].wavelengths[0]))
-      .y((d, i) => yScale(d));
-
     for (let i = 0; i < loaded.length; i++) {
       const s = loaded[i];
+      // Build array of {w, r} pairs for D3 line generator
+      const points = s.wavelengths.map((w, j) => ({ w, r: s.reflectance[j] }));
+
       const lineGen = d3.line()
-        .x((_, j) => xScale(s.wavelengths[j]))
-        .y((d) => yScale(d))
-        .defined((d) => isFinite(d));
+        .x(d => xScale(d.w))
+        .y(d => yScale(d.r))
+        .defined(d => d.w != null && d.r != null && isFinite(d.w) && isFinite(d.r));
 
       chartG.append("path")
-        .datum(s.reflectance)
+        .datum(points)
         .attr("class", `sl-spectrum-line ${LINE_CLASSES[i % MAX_OVERLAY]}`)
         .attr("fill", "none")
         .attr("stroke-width", 1.5)
@@ -387,14 +386,11 @@ const SL = (() => {
 
     chartG.selectAll("path.sl-spectrum-line")
       .attr("d", function () {
-        const data = d3.select(this).datum();
-        const idx = [...chartG.selectAll("path.sl-spectrum-line")].indexOf(this);
-        const s = loaded[idx];
-        if (!s) return "";
+        const points = d3.select(this).datum();
         return d3.line()
-          .x((_, j) => newX(s.wavelengths[j]))
-          .y((d) => newY(d))
-          .defined(d => isFinite(d))(data);
+          .x(d => newX(d.w))
+          .y(d => newY(d.r))
+          .defined(d => d.w != null && d.r != null && isFinite(d.w) && isFinite(d.r))(points);
       });
   }
 
