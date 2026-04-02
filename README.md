@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/python-3.11%2B-informational)
 ![Status](https://img.shields.io/badge/status-1.0.0-green)
 [![CI](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml/badge.svg)](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://zenodo.org/doi/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19390679.svg)](https://zenodo.org/doi/10.5281/zenodo.19390679)
 [![codecov](https://codecov.io/gh/chrislyonsKY/speclib/graph/badge.svg)](https://codecov.io/gh/chrislyonsKY/speclib)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f45422a205bb46ff9955f01622d2d6ab)](https://app.codacy.com/gh/chrislyonsKY/speclib/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![NumPy](https://img.shields.io/badge/numpy-%E2%89%A51.26-013243?logo=numpy)
@@ -104,7 +104,7 @@ Browse the spectral library at: **https://chrislyonsKY.github.io/speclib/**
   title = {speclib: Federated Spectral Signature Library},
   year = {2026},
   url = {https://github.com/chrislyonsKY/speclib},
-  doi = {10.5281/zenodo.XXXXXXX},
+  doi = {10.5281/zenodo.19390679},
   license = {GPL-3.0}
 }
 ```
