@@ -7,7 +7,6 @@ static site building, and optional server startup.
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 
 import click
 
@@ -17,7 +16,7 @@ logger = logging.getLogger(__name__)
 @click.group()
 @click.version_option()
 def main() -> None:
-    """speclib — Federated spectral signature library."""
+    """Speclib — Federated spectral signature library."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
@@ -40,8 +39,9 @@ def ingest(source: str, config: str | None, archive: str) -> None:
 @click.option("--source", help="Filter by source library.")
 @click.option("--quality", help="Minimum quality flag.")
 @click.option("--archive", default="speclib_archive.h5", help="HDF5 archive path.")
-def search(query: str, category: str | None, source: str | None,
-           quality: str | None, archive: str) -> None:
+def search(
+    query: str, category: str | None, source: str | None, quality: str | None, archive: str
+) -> None:
     """Search the spectral library."""
     # TODO: Load library from archive or Parquet
     # TODO: Apply search with filters
@@ -51,8 +51,13 @@ def search(query: str, category: str | None, source: str | None,
 
 @main.command()
 @click.argument("spectrum_id")
-@click.option("--format", "fmt", type=click.Choice(["json", "ascii", "esl", "sli", "specpr"]),
-              default="json", help="Export format.")
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["json", "ascii", "esl", "sli", "specpr"]),
+    default="json",
+    help="Export format.",
+)
 @click.option("--output", "-o", type=click.Path(), help="Output file path.")
 @click.option("--archive", default="speclib_archive.h5", help="HDF5 archive path.")
 def export(spectrum_id: str, fmt: str, output: str | None, archive: str) -> None:

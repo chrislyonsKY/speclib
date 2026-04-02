@@ -7,8 +7,7 @@ quality flags, and provenance tracking.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -77,7 +76,7 @@ class Spectrum:
     Attributes:
         name: Human-readable spectrum name.
         wavelengths: Wavelength positions in micrometers (µm), sorted ascending.
-        reflectance: Reflectance values on 0.0–1.0 scale.
+        reflectance: Reflectance values on 0.0-1.0 scale.
         metadata: Full sample description and provenance.
         quality: Overall quality assessment flag.
         errors: Per-band measurement uncertainty (optional).

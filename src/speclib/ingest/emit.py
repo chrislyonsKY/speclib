@@ -13,13 +13,13 @@ class EmitAdapter(BaseAdapter):
     """Ingestion adapter for the EMIT spectral library."""
 
     def discover(self) -> list[SourceRecord]:
-        # TODO: Implement
+        """List available spectra from EMIT L2B source."""
         raise NotImplementedError
 
     def fetch(self, record_id: str) -> RawSpectrum:
-        # TODO: Implement
+        """Retrieve a single raw spectrum from EMIT."""
         raise NotImplementedError
 
     def normalize(self, raw: RawSpectrum) -> Spectrum:
-        # TODO: Implement
+        """Convert EMIT format to internal Spectrum model."""
         raise NotImplementedError

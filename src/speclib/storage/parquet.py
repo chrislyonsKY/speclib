@@ -9,7 +9,6 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from speclib.core.spectrum import Spectrum
 from speclib.storage.hdf5 import HDF5Archive
 
 logger = logging.getLogger(__name__)
@@ -19,6 +18,7 @@ class ParquetStore:
     """Parquet-based query layer for the spectral library."""
 
     def __init__(self, path: Path) -> None:
+        """Initialize Parquet store at the given directory path."""
         self.path = Path(path)
 
     def build_from_hdf5(self, archive: HDF5Archive) -> None:

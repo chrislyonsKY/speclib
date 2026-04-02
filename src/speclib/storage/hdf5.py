@@ -7,8 +7,8 @@ hierarchically by material category with per-spectrum attributes.
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from speclib.core.spectrum import MaterialCategory, Spectrum
 
@@ -23,6 +23,7 @@ class HDF5Archive:
     """
 
     def __init__(self, path: Path) -> None:
+        """Initialize HDF5 archive at the given path."""
         self.path = Path(path)
 
     def write(self, spectrum: Spectrum) -> None:

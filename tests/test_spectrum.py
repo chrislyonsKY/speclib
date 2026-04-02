@@ -1,10 +1,5 @@
 """Tests for core Spectrum data model."""
 
-import numpy as np
-import pytest
-
-from speclib.core.spectrum import MaterialCategory, QualityFlag, SourceLibrary, Spectrum
-
 
 class TestSpectrum:
     """Tests for Spectrum construction and validation."""

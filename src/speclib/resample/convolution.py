@@ -27,8 +27,9 @@ def load_sensor_response(sensor: str | Path) -> dict:
     raise NotImplementedError
 
 
-def oversample(wavelengths: np.ndarray, reflectance: np.ndarray,
-               target_spacing: float = 0.0001) -> tuple[np.ndarray, np.ndarray]:
+def oversample(
+    wavelengths: np.ndarray, reflectance: np.ndarray, target_spacing: float = 0.0001
+) -> tuple[np.ndarray, np.ndarray]:
     """Oversample spectrum via cubic-spline interpolation (splib07b method).
 
     Args:
@@ -44,8 +45,9 @@ def oversample(wavelengths: np.ndarray, reflectance: np.ndarray,
     raise NotImplementedError
 
 
-def convolve_gaussian(wavelengths: np.ndarray, reflectance: np.ndarray,
-                      center: float, fwhm: float) -> float:
+def convolve_gaussian(
+    wavelengths: np.ndarray, reflectance: np.ndarray, center: float, fwhm: float
+) -> float:
     """Convolve spectrum with a Gaussian response function for one band.
 
     Args:

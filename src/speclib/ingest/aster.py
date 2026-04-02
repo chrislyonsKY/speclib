@@ -13,13 +13,13 @@ class AsterAdapter(BaseAdapter):
     """Ingestion adapter for the ASTER spectral library."""
 
     def discover(self) -> list[SourceRecord]:
-        # TODO: Implement
+        """List available spectra from ASTER source."""
         raise NotImplementedError
 
     def fetch(self, record_id: str) -> RawSpectrum:
-        # TODO: Implement
+        """Retrieve a single raw spectrum from ASTER."""
         raise NotImplementedError
 
     def normalize(self, raw: RawSpectrum) -> Spectrum:
-        # TODO: Implement
+        """Convert ASTER format to internal Spectrum model."""
         raise NotImplementedError
