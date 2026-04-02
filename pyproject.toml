@@ -34,7 +34,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Image Processing",
-    "Topic :: Scientific/Engineering :: Earth Science",
 ]
 dependencies = [
     "numpy>=1.26",
