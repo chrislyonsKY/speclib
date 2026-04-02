@@ -14,18 +14,13 @@ const SL = (() => {
 
   const MAX_OVERLAY = 6;
   const LINE_CLASSES = ["sl-line-0", "sl-line-1", "sl-line-2", "sl-line-3", "sl-line-4", "sl-line-5"];
-  // Resolve data URL: find the site root from the __config base path
+  // Build absolute data URL from the current page location
   const DATA_URL = (function () {
-    const cfg = document.getElementById("__config");
-    if (cfg) {
-      try {
-        const base = JSON.parse(cfg.textContent).base;
-        return base + "/data/";
-      } catch { /* fall through */ }
-    }
-    // Fallback: navigate up from /library/ to site root
-    const path = window.location.pathname.replace(/\/library\/?$/, "/");
-    return window.location.origin + path + "data/";
+    const origin = window.location.origin;
+    const path = window.location.pathname;
+    // Strip /library/ or /library/index.html to get site root
+    const root = path.replace(/\/library\/(index\.html)?$/, "/");
+    return origin + root + "data/";
   })();
 
   let catalog = null;
