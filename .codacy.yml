@@ -6,6 +6,8 @@ engines:
     enabled: false
   bandit:
     enabled: true
+    exclude:
+      - "tests/**"
 
 exclude_paths:
   - "data/**"

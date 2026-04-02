@@ -23,4 +23,4 @@ jobs:
     steps:
       - name: Build and deploy docs
         id: zensical
-        uses: cssnr/zensical-action@v1
+        uses: cssnr/zensical-action@4a85be625b4c38e82cb7b3c1c8a9683c86807468 # v1
