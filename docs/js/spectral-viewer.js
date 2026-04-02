@@ -162,8 +162,12 @@ const SL = (() => {
     }
 
     try {
-      const resp = await fetch(DATA_URL + `spectra/${catalogEntry.id}.json`);
-      if (!resp.ok) return;
+      const url = DATA_URL + `spectra/${catalogEntry.id}.json`;
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        console.error("Failed to fetch spectrum:", url, resp.status);
+        return;
+      }
       const data = await resp.json();
 
       // Filter out NaN values for clean plotting
@@ -181,8 +185,8 @@ const SL = (() => {
       renderChart();
       showMetadata(catalogEntry);
       highlightRow(catalogEntry.id);
-    } catch {
-      // silently fail on bad fetch
+    } catch (err) {
+      console.error("Error loading spectrum:", err);
     }
   }
 
@@ -230,7 +234,7 @@ const SL = (() => {
     const container = document.getElementById("sl-chart");
     if (!container) return;
 
-    const width = container.clientWidth;
+    const width = container.clientWidth || 800;
     const height = container.clientHeight || 350;
 
     svg = d3.select(container)
