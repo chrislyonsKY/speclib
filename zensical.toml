@@ -40,9 +40,6 @@ content_code_copy = true
   icon = "fontawesome/brands/github"
   link = "https://github.com/chrislyonsKY/speclib"
 
-[theme.custom_dir]
-path = "docs/overrides"
-
 [extra_css]
 files = ["stylesheets/extra.css", "stylesheets/library.css"]
 
