@@ -109,8 +109,6 @@ Browse the spectral library at: **https://chrislyonsKY.github.io/speclib/**
 }
 ```
 
-> **Note:** Replace `XXXXXXX` with the actual Zenodo DOI after the first release is archived.
-
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
