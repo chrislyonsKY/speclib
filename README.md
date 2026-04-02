@@ -3,6 +3,7 @@
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.11%2B-informational)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5029a0ef01b04bc882c4a9975c432a48)](https://app.codacy.com/gh/chrislyonsKY/speclib?utm_source=github.com&utm_medium=referral&utm_content=chrislyonsKY/speclib&utm_campaign=Badge_Grade)
 [![CI](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml/badge.svg)](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://zenodo.org/doi/10.5281/zenodo.XXXXXXX)
 [![codecov](https://codecov.io/gh/chrislyonsKY/speclib/graph/badge.svg)](https://codecov.io/gh/chrislyonsKY/speclib)
