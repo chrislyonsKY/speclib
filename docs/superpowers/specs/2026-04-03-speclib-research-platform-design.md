@@ -14,6 +14,58 @@ attribution, and discoverability. The options are a supplementary ZIP nobody fin
 
 There is no "data journal" for spectral measurements.
 
+## 1.1 Prior Art & Federated Sources
+
+Six spectral libraries define the current landscape. All share the same limitation:
+they are static, closed collections with no contribution pathway, no community
+annotation, and limited programmatic access.
+
+| Library | Citation | Spectra | Limitation | speclib adapter |
+|---------|----------|---------|-----------|-----------------|
+| **USGS splib07** | Kokaly et al. (2017) | ~2,600 | ASCII/SPECPR download only; no API | `usgs` — **ingested** |
+| **USGS splib06a** | Clark et al. (2007) | ~1,300 | Superseded by splib07; still widely cited | Covered by `usgs` |
+| **ASTER v2.0** | Baldridge et al. (2009) | ~2,400 | JPL-hosted; custom header format; no updates since 2009 | `aster` — stub |
+| **ECOSTRESS** | Meerdink et al. (2019) | ~3,400 | Evolved from ASTER; HDF5/CSV; limited search | `ecostress` — stub |
+| **JPL 160 Minerals** | Grove et al. (1992) | 160 | Lab spectra only; 0.4–2.5 µm; no vegetation | Future source |
+| **IGCP-264** | Kruse & Hauff (1992) | ~500 | Geological focus; out of print; historical value | Future source |
+
+Elvidge (1990) provides foundational reference data for dry plant material
+reflectance characteristics that inform vegetation spectral interpretation but is
+not a library per se.
+
+**What none of these provide:**
+- A way for researchers to contribute their own spectra
+- Peer review of contributed data
+- Citable DOIs for individual spectra or collections
+- Community annotations about real-world use
+- Programmatic access via installable packages (Python/R)
+- Sensor separability analysis or endmember set building
+
+speclib federates the reference data from these sources (via ingestion adapters)
+and adds everything they lack. The adapter roadmap priority is:
+1. USGS splib07 (done)
+2. ECOSTRESS (highest value — largest library, active maintenance by JPL)
+3. ASTER v2.0 (overlaps with ECOSTRESS but widely cited separately)
+4. JPL Minerals / IGCP-264 (niche but valuable for geological applications)
+
+### References
+
+- Baldridge, A. M., S. J. Hook, C. I. Grove, and G. Rivera. "The ASTER Spectral
+  Library Version 2.0." *Remote Sensing of Environment* 113 (2009): 711–715.
+- Clark, R. N., G. A. Swayze, R. A. Wise, K. E. Livo, T. M. Hoefen, R. F. Kokaly,
+  and S. J. Sutley. "USGS Digital Spectral Library splib06a." U.S. Geological Survey
+  Data Series DS-231 (2007).
+- Elvidge, C. D. "Visible and Infrared Reflectance Characteristics of Dry Plant
+  Materials." *International Journal of Remote Sensing* 11, no. 10 (1990): 1775–1795.
+- Grove, C. I., S. J. Hook, and E. D. Paylor II. "Laboratory Reflectance Spectra of
+  160 Minerals, 0.4 to 2.5 Micrometers." Jet Propulsion Laboratory Publication 92-2
+  (1992).
+- Kokaly, R. F., R. N. Clark, G. A. Swayze, K. E. Livo, T. M. Hoefen, N. C. Pearson,
+  R. A. Wise, W. M. Benzel, H. A. Lowers, R. L. Driscoll, and A. J. Klein. "USGS
+  Spectral Library Version 7." U.S. Geological Survey Data Series 1035 (2017).
+- Kruse, F. A., and P. L. Hauff, eds. "The IGCP-264 Spectral Properties Database."
+  IUGS/UNESCO, Special Publication (1992).
+
 ## 2. Core Concept
 
 speclib is a **federated, peer-reviewed spectral data repository with an integrated
