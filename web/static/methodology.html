@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methodology — speclib</title>
+    <meta name="description" content="Spectral processing methodology for the speclib federated spectral signature library. Continuum removal, derivatives, band math, and convolution methods.">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            display: block;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            min-height: auto;
+        }
+        .method-nav {
+            position: sticky;
+            top: 0;
+            background: var(--c-bg);
+            border-bottom: 1px solid var(--c-border);
+            padding: 0.5rem 0;
+            margin-bottom: 1.5rem;
+            z-index: 10;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .method-nav a {
+            font-size: var(--font-size-sm);
+            padding: 0.2rem 0.6rem;
+            border-radius: var(--radius-sm);
+            color: var(--c-text-secondary);
+            text-decoration: none;
+            transition: all 150ms ease;
+        }
+        .method-nav a:hover { background: var(--c-primary-subtle); color: var(--c-primary); }
+        .back-link { font-weight: 600; margin-right: auto; }
+        h1 { font-size: 1.75rem; margin-bottom: 0.25rem; color: var(--c-text); }
+        .subtitle { color: var(--c-text-muted); margin-bottom: 2rem; }
+        h2 {
+            font-size: 1.15rem;
+            color: var(--c-primary);
+            margin-top: 2.5rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid var(--c-border-light);
+        }
+        h3 { font-size: 1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        p, li { line-height: 1.7; margin-bottom: 0.75rem; color: var(--c-text); }
+        ul, ol { padding-left: 1.5rem; }
+        li { margin-bottom: 0.4rem; }
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: var(--c-surface-alt);
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+            color: var(--c-primary);
+        }
+        pre {
+            background: var(--c-surface-alt);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        pre code { background: none; padding: 0; color: var(--c-text); }
+        .formula {
+            background: var(--c-surface-alt);
+            border-left: 3px solid var(--c-primary);
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: var(--font-size-sm);
+        }
+        th, td {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--c-border);
+            text-align: left;
+        }
+        th {
+            background: var(--c-surface-alt);
+            font-weight: 600;
+            color: var(--c-text-secondary);
+        }
+        td code { font-size: 0.8rem; }
+        .ref { font-size: var(--font-size-sm); color: var(--c-text-muted); }
+        .ref a { color: var(--c-text-secondary); }
+        .note {
+            background: var(--c-accent-subtle);
+            border-left: 3px solid var(--c-accent);
+            padding: 0.6rem 1rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            font-size: var(--font-size-sm);
+            margin: 1rem 0;
+        }
+        footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--c-border);
+            font-size: var(--font-size-xs);
+            color: var(--c-text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="method-nav">
+    <a href="index.html" class="back-link">&larr; Back to Viewer</a>
+    <a href="#data-sources">Data Sources</a>
+    <a href="#spectral-units">Units</a>
+    <a href="#continuum-removal">Continuum Removal</a>
+    <a href="#derivatives">Derivatives</a>
+    <a href="#band-indices">Band Indices</a>
+    <a href="#convolution">Convolution</a>
+    <a href="#group-statistics">Statistics</a>
+    <a href="#quality">Quality</a>
+    <a href="#references">References</a>
+</nav>
+
+<h1>Methodology</h1>
+<p class="subtitle">Spectral processing methods used in the speclib viewer and Python package.</p>
+
+<!-- ============================================================ -->
+<h2 id="data-sources">1. Data Sources and Ingestion</h2>
+
+<p>speclib federates reflectance spectra from multiple public spectral libraries through dedicated ingestion adapters. Each adapter preserves original metadata and provenance information without modification.</p>
+
+<h3>1.1 USGS Spectral Library Version 7 (splib07a)</h3>
+<p>The primary source for mineral, vegetation, soil, artificial material, organic compound, coating, and liquid spectra. Data is ingested from the ASCII distribution of splib07a, which provides reflectance measurements from multiple spectrometers:</p>
+
+<table>
+    <thead>
+        <tr><th>Instrument</th><th>Range</th><th>Channels</th><th>Type</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>ASD FieldSpec FR/HR/NG</td><td>0.35 &ndash; 2.5 &mu;m</td><td>2,151</td><td>VNIR-SWIR</td></tr>
+        <tr><td>Beckman 5270</td><td>0.2 &ndash; 3.0 &mu;m</td><td>480</td><td>UV-SWIR</td></tr>
+        <tr><td>Nicolet FTIR (NIC4)</td><td>1.12 &ndash; 216 &mu;m</td><td>4,595</td><td>SWIR-TIR</td></tr>
+        <tr><td>AVIRIS 1996</td><td>0.37 &ndash; 2.5 &mu;m</td><td>224</td><td>Imaging spectrometer</td></tr>
+    </tbody>
+</table>
+
+<p>Reflectance values of <code>-1.23e+34</code> in the USGS data are treated as no-data and excluded from all calculations. Wavelength arrays are instrument-specific and paired to each spectrum based on the instrument code in the filename.</p>
+
+<p class="ref">Kokaly, R.F., Clark, R.N., Swayze, G.A., et al., 2017, USGS Spectral Library Version 7: U.S. Geological Survey Data Series 1035, 61 p., <a href="https://doi.org/10.3133/ds1035">https://doi.org/10.3133/ds1035</a>.</p>
+
+<h3>1.2 Kentucky Field Data (Lyons, Gyawali, Cristan, Acharya, Gebremedhin, &amp; Andries, 2024)</h3>
+<p>Field-collected leaf reflectance spectra targeting invasive species detection in Kentucky recreation areas. Measurements were collected using a CID CI-710 leaf spectrometer with an Ocean Optics USB4000 sensor (345 &ndash; 1,035 nm, 3,648 channels).</p>
+
+<p>The collection includes <em>Lonicera maackii</em> (Amur honeysuckle) leaf reflectance across three canopy strata (upper, mid, lower) from multiple individual plants at Raven Run and Shelby Trails sites in central Kentucky.</p>
+
+<p class="ref">Lyons, W. C., Gyawali, B. R., Cristan, R., Acharya, S., Gebremedhin, M., &amp; Andries, K. (2024). Evaluating spectral properties of invasive plant species in Kentucky recreation areas. <em>International Journal of Remote Sensing</em>, 45(18), 6470&ndash;6494. <a href="https://doi.org/10.1080/01431161.2024.2391095">https://doi.org/10.1080/01431161.2024.2391095</a>.</p>
+
+<h3>1.3 Naming Convention</h3>
+<p>All spectra follow a USGS-inspired naming convention:</p>
+<pre><code>Material_Name SampleCode.MeasurementSuffix [Descriptor]</code></pre>
+
+<p>USGS examples: <code>Actinolite HS116.3B</code>, <code>Quartz GDS31 0-74um fr</code></p>
+<p>Kentucky field data: <code>L.maackii KY01.U1 Leaf</code> where <code>KY01</code> is the individual plant, <code>U1</code> is upper canopy replicate 1, and <code>Leaf</code> is the tissue type.</p>
+
+<!-- ============================================================ -->
+<h2 id="spectral-units">2. Spectral Units and Conventions</h2>
+
+<ul>
+    <li><strong>Wavelength:</strong> micrometers (&mu;m), always sorted ascending</li>
+    <li><strong>Reflectance:</strong> unitless ratio, 0.0 &ndash; 1.0 (not percent)</li>
+    <li><strong>Spatial reference (KY data):</strong> EPSG:3089 (Kentucky Single Zone, NAD83)</li>
+    <li><strong>No-data:</strong> stored as <code>null</code> in JSON, <code>NaN</code> in arrays; excluded from all computations</li>
+</ul>
+
+<div class="note">
+    Reflectance values are stored as-measured. No interpolation, smoothing, or resampling is applied during ingestion. All spectral transforms in the viewer are computed client-side from original data.
+</div>
+
+<!-- ============================================================ -->
+<h2 id="continuum-removal">3. Continuum Removal</h2>
+
+<p>Continuum removal normalizes a reflectance spectrum by dividing it by its spectral continuum (the convex hull upper envelope). This isolates absorption features and enables comparison of absorption depth independent of overall albedo.</p>
+
+<h3>3.1 Algorithm</h3>
+<ol>
+    <li>Compute the <strong>upper convex hull</strong> of the spectrum in wavelength&ndash;reflectance space using Andrew's monotone chain algorithm.</li>
+    <li><strong>Interpolate</strong> the convex hull vertices linearly to produce a continuous continuum line at every wavelength.</li>
+    <li><strong>Divide</strong> the original reflectance by the continuum at each wavelength.</li>
+</ol>
+
+<div class="formula">
+    R<sub>CR</sub>(&lambda;) = R(&lambda;) / C(&lambda;)
+</div>
+
+<p>Where R<sub>CR</sub> is continuum-removed reflectance, R is original reflectance, and C is the interpolated convex hull continuum.</p>
+
+<p>Values where C(&lambda;) &lt; 0.001 are set to 1.0 to avoid division by near-zero.</p>
+
+<p>Continuum-removed reflectance ranges from 0.0 to 1.0, where 1.0 indicates the spectrum touches its continuum (no absorption) and values &lt; 1.0 indicate absorption features. This is the standard approach used in USGS spectroscopy analysis.</p>
+
+<p class="ref">Clark, R.N. and Roush, T.L., 1984, Reflectance spectroscopy: Quantitative analysis techniques for remote sensing applications: Journal of Geophysical Research, v. 89, p. 6329&ndash;6340.</p>
+
+<!-- ============================================================ -->
+<h2 id="derivatives">4. Spectral Derivatives</h2>
+
+<p>Spectral derivatives enhance subtle features and inflection points that are difficult to identify in raw reflectance data. The first derivative is particularly useful for identifying the <strong>red edge position</strong> in vegetation spectra (~0.68&ndash;0.75 &mu;m).</p>
+
+<h3>4.1 First Derivative</h3>
+<p>Computed using central finite differences:</p>
+<div class="formula">
+    dR/d&lambda;<sub>i</sub> = (R<sub>i+1</sub> &minus; R<sub>i&minus;1</sub>) / (&lambda;<sub>i+1</sub> &minus; &lambda;<sub>i&minus;1</sub>)
+</div>
+
+<h3>4.2 Second Derivative</h3>
+<p>Computed by applying the central difference operator to the first derivative:</p>
+<div class="formula">
+    d&sup2;R/d&lambda;&sup2;<sub>i</sub> = (dR/d&lambda;<sub>i+1</sub> &minus; dR/d&lambda;<sub>i&minus;1</sub>) / (&lambda;<sub>i+1</sub> &minus; &lambda;<sub>i&minus;1</sub>)
+</div>
+
+<p>No smoothing or filtering is applied prior to differentiation. For noisy spectra, consider applying a Savitzky-Golay filter in the Python package before derivative analysis.</p>
+
+<p class="ref">Tsai, F. and Philpot, W., 1998, Derivative analysis of hyperspectral data: Remote Sensing of Environment, v. 66, p. 41&ndash;51.</p>
+
+<!-- ============================================================ -->
+<h2 id="band-indices">5. Band Indices</h2>
+
+<p>The viewer computes standard spectral indices by interpolating reflectance at the required band center wavelengths. Indices are computed from the continuous library spectrum, not from convolved sensor bands.</p>
+
+<table>
+    <thead>
+        <tr><th>Index</th><th>Formula</th><th>Bands (&mu;m)</th><th>Application</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>NDVI</strong></td>
+            <td><code>(NIR &minus; Red) / (NIR + Red)</code></td>
+            <td>NIR: 0.865, Red: 0.655</td>
+            <td>Vegetation vigor</td>
+        </tr>
+        <tr>
+            <td><strong>NDWI</strong></td>
+            <td><code>(Green &minus; NIR) / (Green + NIR)</code></td>
+            <td>Green: 0.56, NIR: 0.865</td>
+            <td>Water content</td>
+        </tr>
+        <tr>
+            <td><strong>NDSI</strong></td>
+            <td><code>(Green &minus; SWIR1) / (Green + SWIR1)</code></td>
+            <td>Green: 0.56, SWIR1: 1.61</td>
+            <td>Snow/ice</td>
+        </tr>
+        <tr>
+            <td><strong>EVI</strong></td>
+            <td><code>2.5 &times; (NIR &minus; Red) / (NIR + 6&times;Red &minus; 7.5&times;Blue + 1)</code></td>
+            <td>NIR: 0.865, Red: 0.655, Blue: 0.48</td>
+            <td>Enhanced vegetation</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Reflectance at each band center is obtained by linear interpolation between the two nearest measured wavelengths. If a required wavelength falls outside the spectrum's range, the index returns <code>N/A</code>.</p>
+
+<div class="note">
+    NDSI will return N/A for spectra that do not extend to the SWIR1 region (1.61 &mu;m), such as the Kentucky field data measured with the CID CI-710 (345 &ndash; 1,035 nm).
+</div>
+
+<!-- ============================================================ -->
+<h2 id="convolution">6. Spectral Convolution to Sensor Bands</h2>
+
+<p>The convolution preview shows what a satellite sensor would measure by convolving the library spectrum with each sensor band's spectral response function (SRF).</p>
+
+<h3>6.1 Method</h3>
+<p>Each sensor band is modeled as a Gaussian spectral response function centered at the band's nominal wavelength with FWHM equal to the band's spectral width:</p>
+
+<div class="formula">
+    SRF(&lambda;) = exp(&minus;0.5 &times; ((&lambda; &minus; &lambda;<sub>center</sub>) / &sigma;)&sup2;)<br>
+    where &sigma; = FWHM / 2.355
+</div>
+
+<p>The convolved reflectance for each band is then:</p>
+
+<div class="formula">
+    R<sub>band</sub> = &sum; SRF(&lambda;<sub>i</sub>) &times; R(&lambda;<sub>i</sub>) / &sum; SRF(&lambda;<sub>i</sub>)
+</div>
+
+<h3>6.2 Supported Sensors</h3>
+
+<table>
+    <thead>
+        <tr><th>Sensor</th><th>Bands Shown</th><th>Range</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Landsat 8/9 OLI</td><td>Coastal, Blue, Green, Red, NIR, SWIR1, SWIR2</td><td>0.43 &ndash; 2.29 &mu;m</td></tr>
+        <tr><td>Sentinel-2 MSI</td><td>B1&ndash;B8A, B11, B12</td><td>0.44 &ndash; 2.19 &mu;m</td></tr>
+    </tbody>
+</table>
+
+<p>Convolved values appear as discrete marker points on the chart when the <strong>Convolve</strong> toggle is enabled alongside a sensor band overlay.</p>
+
+<p class="ref">Markham, B.L. and Barker, J.L., 1985, Spectral characterization of the Landsat Thematic Mapper sensors, International Journal of Remote Sensing, v. 6, p. 697&ndash;716.</p>
+
+<!-- ============================================================ -->
+<h2 id="group-statistics">7. Group Statistics</h2>
+
+<p>When multiple spectra are loaded, the <strong>Stats</strong> button computes a mean spectrum and &plusmn;1 standard deviation envelope, displayed as a shaded band behind the individual traces.</p>
+
+<h3>7.1 Method</h3>
+<ol>
+    <li>Determine the <strong>common wavelength range</strong> shared by all loaded spectra.</li>
+    <li><strong>Resample</strong> all spectra to the first trace's wavelength grid within the common range using linear interpolation.</li>
+    <li>At each wavelength, compute the <strong>arithmetic mean</strong> and <strong>population standard deviation</strong> across all traces.</li>
+</ol>
+
+<div class="formula">
+    &mu;(&lambda;) = (1/n) &times; &sum; R<sub>i</sub>(&lambda;)<br>
+    &sigma;(&lambda;) = &radic;((1/n) &times; &sum; (R<sub>i</sub>(&lambda;) &minus; &mu;(&lambda;))&sup2;)
+</div>
+
+<p>The envelope shows &mu; &plusmn; 1&sigma;, which contains approximately 68% of observations for normally distributed data. This is useful for characterizing intra-species spectral variability.</p>
+
+<!-- ============================================================ -->
+<h2 id="quality">8. Data Quality and Provenance</h2>
+
+<h3>8.1 Quality Tiers</h3>
+<table>
+    <thead>
+        <tr><th>Tier</th><th>Description</th><th>Criteria</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>VERIFIED</strong></td><td>Reference-grade measurements</td><td>Published in peer-reviewed spectral libraries (USGS, ECOSTRESS, ASTER/JPL)</td></tr>
+        <tr><td><strong>CURATED</strong></td><td>Expert-reviewed field measurements</td><td>Peer-reviewed publications with documented collection protocols</td></tr>
+        <tr><td><strong>COMMUNITY</strong></td><td>Community contributions</td><td>Submitted via contribution workflow, basic quality checks passed</td></tr>
+    </tbody>
+</table>
+
+<h3>8.2 Provenance Tracking</h3>
+<p>Every spectrum in speclib retains:</p>
+<ul>
+    <li><strong>Source library</strong> and original record identifier</li>
+    <li><strong>Instrument</strong> used for measurement</li>
+    <li><strong>Measurement type</strong> (absolute reflectance, relative reflectance, etc.)</li>
+    <li><strong>License</strong> and citation information</li>
+    <li><strong>Ingestion timestamp</strong> and adapter version</li>
+</ul>
+
+<p>Metadata is never modified during ingestion. Missing fields are stored as null, never fabricated.</p>
+
+<!-- ============================================================ -->
+<h2 id="references">9. References</h2>
+
+<ol>
+    <li>Clark, R.N. and Roush, T.L., 1984, Reflectance spectroscopy: Quantitative analysis techniques for remote sensing applications: <em>Journal of Geophysical Research</em>, v. 89, p. 6329&ndash;6340.</li>
+    <li>Kokaly, R.F., Clark, R.N., Swayze, G.A., et al., 2017, USGS Spectral Library Version 7: <em>U.S. Geological Survey Data Series 1035</em>, 61 p., <a href="https://doi.org/10.3133/ds1035">doi:10.3133/ds1035</a>.</li>
+    <li>Lyons, W. C., Gyawali, B. R., Cristan, R., Acharya, S., Gebremedhin, M., &amp; Andries, K., 2024, Evaluating spectral properties of invasive plant species in Kentucky recreation areas: <em>International Journal of Remote Sensing</em>, v. 45, no. 18, p. 6470&ndash;6494, <a href="https://doi.org/10.1080/01431161.2024.2391095">doi:10.1080/01431161.2024.2391095</a>.</li>
+    <li>Markham, B.L. and Barker, J.L., 1985, Spectral characterization of the Landsat Thematic Mapper sensors: <em>International Journal of Remote Sensing</em>, v. 6, p. 697&ndash;716.</li>
+    <li>Rouse, J.W., Haas, R.H., Schell, J.A., and Deering, D.W., 1974, Monitoring vegetation systems in the Great Plains with ERTS: <em>NASA SP-351</em>, v. 1, p. 309&ndash;317.</li>
+    <li>Tsai, F. and Philpot, W., 1998, Derivative analysis of hyperspectral data: <em>Remote Sensing of Environment</em>, v. 66, p. 41&ndash;51.</li>
+    <li>Huete, A., Didan, K., Miura, T., et al., 2002, Overview of the radiometric and biophysical performance of the MODIS vegetation indices: <em>Remote Sensing of Environment</em>, v. 83, p. 195&ndash;213.</li>
+</ol>
+
+<footer>
+    <p>speclib &mdash; <a href="https://github.com/chrislyonsKY/speclib">GitHub</a> &middot; GPL-3.0 &middot; Methodology last updated April 2026</p>
+</footer>
+
+<script>
+    // Respect saved theme
+    const saved = localStorage.getItem('speclib-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');
+</script>
+</body>
+</html>

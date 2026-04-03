@@ -1,0 +1,98 @@
+name: Update CITATION.cff after Zenodo deposit
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-citation:
+    name: Update CITATION.cff with new Zenodo DOI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Wait for Zenodo to process the release
+        run: sleep 60
+
+      - name: Fetch latest Zenodo DOI for this repo
+        id: zenodo
+        env:
+          ZENODO_CONCEPT_DOI: "10.5281/zenodo.19390678"
+        run: |
+          # Zenodo concept record ID (from the concept DOI)
+          CONCEPT_RECID="19390678"
+
+          # Fetch the concept record which points to the latest version
+          RESPONSE=$(curl -s "https://zenodo.org/api/records/${CONCEPT_RECID}")
+
+          # Extract the latest version DOI
+          LATEST_DOI=$(echo "$RESPONSE" | jq -r '.doi // empty')
+
+          if [ -z "$LATEST_DOI" ]; then
+            echo "::warning::Could not fetch latest DOI from Zenodo. Falling back to release tag."
+            LATEST_DOI="${ZENODO_CONCEPT_DOI}"
+          fi
+
+          echo "doi=${LATEST_DOI}" >> "$GITHUB_OUTPUT"
+          echo "Found latest Zenodo DOI: ${LATEST_DOI}"
+
+      - name: Extract version from release tag
+        id: version
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          # Strip leading 'v' if present
+          VERSION="${TAG#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Release version: ${VERSION}"
+
+      - name: Update CITATION.cff
+        env:
+          NEW_DOI: ${{ steps.zenodo.outputs.doi }}
+          NEW_VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_DATE: ${{ github.event.release.published_at }}
+        run: |
+          DATE_ONLY=$(echo "$RELEASE_DATE" | cut -d'T' -f1)
+
+          # Update DOI
+          sed -i "s|^doi: .*|doi: \"${NEW_DOI}\"|" CITATION.cff
+
+          # Update version
+          sed -i "s|^version: .*|version: ${NEW_VERSION}|" CITATION.cff
+
+          # Update date-released
+          sed -i "s|^date-released: .*|date-released: \"${DATE_ONLY}\"|" CITATION.cff
+
+          echo "Updated CITATION.cff:"
+          cat CITATION.cff
+
+      - name: Update README BibTeX DOI
+        env:
+          NEW_DOI: ${{ steps.zenodo.outputs.doi }}
+        run: |
+          # Update the DOI in the BibTeX citation block
+          sed -i "s|doi = {10\.5281/zenodo\.[0-9]*}|doi = {${NEW_DOI}}|" README.md
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push updates
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CITATION.cff README.md
+          git commit -m "Update CITATION.cff and README DOI for ${{ github.event.release.tag_name }}
+
+          Auto-updated by zenodo-update workflow after Zenodo deposit."
+          git push

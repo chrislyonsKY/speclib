@@ -14,7 +14,7 @@ speclib aggregates reflectance spectra from major public spectral libraries into
 | **ECOSTRESS** | Minerals, vegetation, soils, water, manmade | CC0 / Public Domain |
 | **ASTER/JPL** | Minerals, rocks, soils | NASA Open Data |
 | **EMIT L2B** | Spaceborne mineral identification spectra | NASA Open Data |
-| **Kentucky Field Data** | Invasive species spectra (Lyons et al. 2024) | CC-BY-4.0 |
+| **Kentucky Field Data** | Invasive species spectra (Lyons, Gyawali, Cristan, Acharya, Gebremedhin, & Andries, 2024) | CC-BY-4.0 |
 
 ## Key Features
 
@@ -22,7 +22,7 @@ speclib aggregates reflectance spectra from major public spectral libraries into
 - **Dual storage** — HDF5 archival backend with Parquet query layer
 - **Export** to .esl (Esri), .sli (ENVI), SPECPR binary, ASCII, JSON
 - **Spectral resampling** to Landsat, Sentinel-2, AVIRIS, EMIT, and custom sensors
-- **Interactive web viewer** with D3.js spectral plotting
+- **Interactive web viewer** with Plotly.js spectral plotting, continuum removal, derivatives, and band math
 - **REST API** via optional FastAPI server
 - **Kentucky chapter** with invasive species, mineral, and reclamation spectra
 

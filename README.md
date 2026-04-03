@@ -1,42 +1,97 @@
+<div align="center">
+
+<br>
+
 # speclib
 
-![License](https://img.shields.io/badge/license-GPL--3.0-blue)
-![Python](https://img.shields.io/badge/python-3.11%2B-informational)
-![Status](https://img.shields.io/badge/status-1.0.0-green)
-[![PyPI](https://img.shields.io/pypi/v/speclib?logo=pypi&logoColor=white)](https://pypi.org/project/speclib/)
-[![CI](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml/badge.svg)](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml)
+### The Open Spectral Signature Library
+
+*2,500+ reference spectra. Interactive comparison. Sensor band overlays.*
+*Built for researchers who need more than a static table.*
+
+<br>
+
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![PyPI](https://img.shields.io/pypi/v/speclib?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/speclib/)
+[![CI](https://img.shields.io/github/actions/workflow/status/chrislyonsKY/speclib/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/chrislyonsKY/speclib/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/1199662773.svg)](https://doi.org/10.5281/zenodo.19390678)
-[![codecov](https://codecov.io/gh/chrislyonsKY/speclib/graph/badge.svg)](https://codecov.io/gh/chrislyonsKY/speclib)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f45422a205bb46ff9955f01622d2d6ab)](https://app.codacy.com/gh/chrislyonsKY/speclib/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-![NumPy](https://img.shields.io/badge/numpy-%E2%89%A51.26-013243?logo=numpy)
-![HDF5](https://img.shields.io/badge/HDF5-h5py%20%E2%89%A53.10-blue)
-![Parquet](https://img.shields.io/badge/parquet-pyarrow%20%E2%89%A515.0-blue)
-![D3.js](https://img.shields.io/badge/D3.js-v7-f9a03c?logo=d3.js)
+[![codecov](https://img.shields.io/codecov/c/gh/chrislyonsKY/speclib?style=flat-square&logo=codecov&logoColor=white)](https://codecov.io/gh/chrislyonsKY/speclib)
+[![Codacy](https://img.shields.io/codacy/grade/f45422a205bb46ff9955f01622d2d6ab?style=flat-square&logo=codacy&logoColor=white)](https://app.codacy.com/gh/chrislyonsKY/speclib/dashboard)
 
-> Federated spectral signature library with Kentucky-focused collections
+[![Plotly.js](https://img.shields.io/badge/Plotly.js-v2.35-3F4F75?style=flat-square&logo=plotly&logoColor=white)](https://plotly.com/javascript/)
+[![NumPy](https://img.shields.io/badge/NumPy-%E2%89%A51.26-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org)
+[![HDF5](https://img.shields.io/badge/HDF5-h5py%20%E2%89%A53.10-0075B8?style=flat-square)](https://www.hdfgroup.org/)
+[![Parquet](https://img.shields.io/badge/Parquet-pyarrow%20%E2%89%A515.0-50ABF1?style=flat-square&logo=apache&logoColor=white)](https://arrow.apache.org/)
 
-## Overview
+<br>
 
-speclib aggregates reflectance spectra from major public spectral libraries into a unified, searchable platform. It provides a Python package for researchers, a static web viewer for discovery, and an optional self-hosted API for power users.
+[**Launch Viewer**](https://chrislyonsKY.github.io/speclib/) | [**Install**](#installation) | [**Docs**](https://chrislyonsKY.github.io/speclib/docs/) | [**Cite**](#citation)
 
-The library federates spectra from **USGS Spectral Library v7**, **ECOSTRESS**, **ASTER/JPL**, and **EMIT L2B**, with a dedicated Kentucky chapter seeded with invasive species spectral data from Lyons et al. (2024).
+<br>
 
-## Features
+</div>
 
-- **Federated ingestion** from USGS splib07, ECOSTRESS, ASTER/JPL, and EMIT L2B
-- **Dual storage** — HDF5 archival backend + Parquet query layer
-- **Export to** .esl (Esri), .sli (ENVI), SPECPR binary, ASCII, JSON
-- **Spectral resampling** to Landsat, Sentinel-2, AVIRIS, EMIT, and custom sensors
-- **Static web viewer** on GitHub Pages with D3.js interactive spectral plots
-- **Optional FastAPI server** with REST API and Jinja templates
-- **Kentucky chapter** with invasive species, mineral, and reclamation spectra
+---
 
-## Getting Started
+## Why speclib?
 
-### Prerequisites
+Existing spectral libraries ship as flat files, locked behind clunky viewers, or require proprietary software. **speclib** changes that:
 
-- Python 3.11+
-- pip
+| | USGS Spectra Viewer | JPL ECOSTRESS | **speclib** |
+|---|---|---|---|
+| Interactive chart | | | Plotly.js zoom/pan/crosshair |
+| Compare spectra | | side-by-side only | Up to 6 overlaid traces |
+| Sensor band overlay | | | Landsat 8/9, Sentinel-2 |
+| Absorption annotations | | | Fe, Al-OH, H2O, CO3, Chl |
+| Export from viewer | | | CSV + PNG |
+| Shareable URLs | | | Permalink any comparison |
+| Dark mode | | | System-aware |
+| Federated sources | USGS only | ECOSTRESS only | USGS + ECOSTRESS + ASTER + EMIT + field data |
+| Python API | | | `pip install speclib` |
+| Self-hostable | | | Optional FastAPI server |
+| Open source | | | GPL-3.0 |
+
+## What's Inside
+
+**2,592 spectra** across 8 categories from 2 sources — with more adapters in development:
+
+| Category | Count | Source | Instruments |
+|----------|------:|--------|------------|
+| **KY Invasive Species** | 136 | Lyons, Gyawali, Cristan, Acharya, Gebremedhin, & Andries (2024) | CID CI-710 (Ocean Optics USB4000) |
+| **Minerals** | 1,276 | USGS splib07a | ASD FieldSpec, Beckman, Nicolet FTIR |
+| **Vegetation** | 286 | USGS splib07a | ASD FieldSpec, Beckman, AVIRIS |
+| **Organic Compounds** | 359 | USGS splib07a | ASD FieldSpec HR, Nicolet FTIR |
+| **Artificial Materials** | 290 | USGS splib07a | ASD FieldSpec, Beckman |
+| **Soils & Mixtures** | 209 | USGS splib07a | ASD FieldSpec, Beckman, Nicolet |
+| **Liquids** | 24 | USGS splib07a | ASD FieldSpec, Beckman |
+| **Coatings** | 12 | USGS splib07a | Beckman 5270 |
+
+### Kentucky Chapter
+
+The library includes field-collected spectral data from Lyons, Gyawali, Cristan, Acharya, Gebremedhin, & Andries (2024) targeting **invasive species detection** in Kentucky:
+
+- **Amur honeysuckle** (*Lonicera maackii*) — 136 leaf reflectance spectra across canopy positions (upper/mid/lower) from Raven Run and Shelby Trails sites
+- Measured with CID CI-710 leaf spectrometer (345 - 1,035 nm, 3,648 bands)
+- All spatial references in **EPSG:3089** (Kentucky Single Zone, NAD83)
+- Licensed CC-BY-4.0
+
+## Web Viewer
+
+**[Launch the viewer](https://chrislyonsKY.github.io/speclib/)** — no install, no login, no server.
+
+### Key capabilities
+
+- **Real-time search** across 2,500+ spectra with instant filtering by category, instrument, and measurement type
+- **Multi-spectra comparison** — overlay up to 6 spectra with WCAG-compliant distinct line styles and colorblind-safe palette
+- **Sensor band overlays** — toggle **Landsat 8/9 OLI** and **Sentinel-2 MSI** band positions directly on the chart (essential for field-to-satellite workflows)
+- **Absorption feature markers** — diagnostic wavelengths for Fe3+, Fe2+, Chlorophyll, H2O, Al-OH, Mg-OH/CO3 annotated on-chart
+- **Export** — download any comparison as CSV or publication-ready PNG
+- **Permalink sharing** — URL encodes your exact view (spectra selection, category, search query)
+- **Dark/light mode** — respects system preference, toggleable
+- **Keyboard accessible** — press `/` to focus search, full keyboard navigation
+
+## Python Package
 
 ### Installation
 
@@ -44,12 +99,10 @@ The library federates spectra from **USGS Spectral Library v7**, **ECOSTRESS**, 
 pip install speclib
 ```
 
-With optional dependencies:
-
 ```bash
 pip install speclib[server]    # FastAPI server
 pip install speclib[emit]      # EMIT L2B support (netCDF4)
-pip install speclib[all]       # Everything including dev tools
+pip install speclib[all]       # Everything
 ```
 
 ### Quick Start
@@ -57,16 +110,15 @@ pip install speclib[all]       # Everything including dev tools
 ```python
 from speclib import SpectralLibrary
 
-# Load the library from an HDF5 archive
 lib = SpectralLibrary.from_hdf5("speclib_archive.h5")
 
-# Search for quartz spectra
+# Search
 results = lib.search("quartz", category="MINERAL")
 
-# Plot a spectrum
+# Plot
 results[0].plot()
 
-# Export to Esri Spectral Library format
+# Export to Esri / ENVI / SPECPR
 results[0].export("quartz.esl", format="esl")
 
 # Resample to Landsat 8 OLI bands
@@ -78,46 +130,72 @@ resampled = results[0].resample("L8_OLI")
 ```bash
 speclib ingest usgs --config data/upstream/usgs_splib07.yaml
 speclib search "honeysuckle" --category KY_INVASIVE
-speclib export usgs_mineral_quartz_a1b2c3d4 --format sli --output quartz.sli
-speclib build
-speclib serve
+speclib export <spectrum_id> --format sli --output quartz.sli
+speclib build    # Generate static JSON for the web viewer
+speclib serve    # Launch optional FastAPI server
 ```
 
-## Web Viewer
+## Architecture
 
-Browse the spectral library at: **https://chrislyonsKY.github.io/speclib/**
+```
+Upstream Sources          Storage Layer              Distribution Layer
+┌──────────────┐     ┌───────────────────┐     ┌──────────────────────┐
+│  USGS splib07 │────>│                   │     │  GitHub Pages Viewer │
+│  ECOSTRESS    │────>│  HDF5 Archive     │────>│  (Plotly.js + JSON)  │
+│  ASTER/JPL    │────>│  (source of truth)│     ├──────────────────────┤
+│  EMIT L2B     │────>│        │          │     │  FastAPI Server      │
+│  KY Field     │────>│        v          │     │  (optional, Parquet) │
+└──────────────┘     │  Parquet Query    │────>│  REST API + Jinja    │
+                      └───────────────────┘     └──────────────────────┘
+```
 
-## Data Sources
+- **HDF5** is the archival source of truth (gzip-4 compressed, hierarchical)
+- **Parquet** is the derived query layer (columnar, fast filtering, GeoParquet for spatial)
+- **Static JSON** powers the zero-dependency GitHub Pages viewer
+- Each upstream source has a dedicated **ingestion adapter** inheriting from `BaseAdapter`
 
-| Source | License | Description |
+## Resampling
+
+Convolve any library spectrum to match target sensor bandpasses:
+
+| Sensor | Bands | Range |
+|--------|------:|-------|
+| Landsat 8/9 OLI | 7 | 0.43 - 2.29 µm |
+| Sentinel-2 MSI | 13 | 0.44 - 2.19 µm |
+| AVIRIS-Classic | 224 | 0.37 - 2.50 µm |
+| AVIRIS-NG | 425 | 0.38 - 2.51 µm |
+| EMIT | 285 | 0.38 - 2.50 µm |
+| ASD FieldSpec | 2,151 | 0.35 - 2.50 µm |
+| Custom | user-defined | user-defined |
+
+## Data Provenance
+
+| Source | License | Attribution |
 |--------|---------|-------------|
-| USGS Spectral Library v7 | US Public Domain | Minerals, rocks, soils, vegetation, manmade materials |
-| ECOSTRESS Spectral Library | CC0 / Public Domain | Minerals, vegetation, soils, water, manmade |
-| ASTER/JPL Spectral Library | NASA Open Data | Minerals, rocks, soils |
-| EMIT L2B | NASA Open Data | Spaceborne mineral identification spectra |
-| Kentucky Field Data | CC-BY-4.0 | Invasive species spectra (Lyons et al. 2024) |
+| **USGS Spectral Library v7** | US Public Domain | Kokaly, R.F., et al., 2017, USGS Spectral Library Version 7 |
+| **ECOSTRESS** | CC0 / Public Domain | Baldridge, A.M., et al., 2009, ECOSTRESS spectral library |
+| **ASTER/JPL** | NASA Open Data | Jet Propulsion Laboratory, California Institute of Technology |
+| **EMIT L2B** | NASA Open Data | NASA/JPL EMIT Mission |
+| **KY Field Data** | CC-BY-4.0 | Lyons, W. C., Gyawali, B. R., Cristan, R., Acharya, S., Gebremedhin, M., & Andries, K. (2024). *Int. J. Remote Sensing*, 45(18), 6470–6494. [doi:10.1080/01431161.2024.2391095](https://doi.org/10.1080/01431161.2024.2391095) |
 
 ## Citation
 
 ```bibtex
 @software{lyons2026speclib,
-  author = {Lyons, Chris},
-  title = {speclib: Federated Spectral Signature Library},
-  year = {2026},
-  url = {https://github.com/chrislyonsKY/speclib},
-  doi = {10.5281/zenodo.19390679},
-  license = {GPL-3.0}
+  author       = {Lyons, Chris},
+  title        = {speclib: Federated Spectral Signature Library},
+  year         = {2026},
+  publisher    = {Zenodo},
+  url          = {https://github.com/chrislyonsKY/speclib},
+  doi          = {10.5281/zenodo.19390679},
+  license      = {GPL-3.0}
 }
 ```
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Security
-
-See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
+We welcome community spectral contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, and [Quality Standards](docs/guide/quality-standards.md) for submission criteria.
 
 ## License
 
-GPL-3.0-only — see [LICENSE](LICENSE) for details.
+GPL-3.0-only — see [LICENSE](LICENSE).

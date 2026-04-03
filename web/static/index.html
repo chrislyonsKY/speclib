@@ -1,40 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>speclib — Spectral Signature Library</title>
+    <meta name="description" content="Open federated spectral signature library with 2,400+ reference spectra from USGS splib07. Interactive viewer for minerals, vegetation, soils, and more.">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
 <body>
-    <header>
-        <h1>speclib</h1>
-        <p>Federated Spectral Signature Library</p>
+    <!-- Top bar -->
+    <header id="top-bar">
+        <div class="header-left">
+            <h1 class="logo">spec<span class="logo-accent">lib</span></h1>
+            <span class="tagline">Federated Spectral Signature Library</span>
+        </div>
+        <div class="header-right">
+            <a href="methodology.html" class="header-link" title="Spectral processing methodology">Methodology</a>
+            <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark/light mode" title="Toggle theme">
+                <span class="theme-icon-light">&#9790;</span>
+                <span class="theme-icon-dark">&#9728;</span>
+            </button>
+            <a href="https://github.com/chrislyonsKY/speclib" class="icon-btn" aria-label="GitHub repository" title="View source" target="_blank" rel="noopener">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            </a>
+        </div>
     </header>
-    <main>
-        <section id="search">
-            <input type="text" id="search-input" placeholder="Search spectra (e.g., quartz, honeysuckle)...">
-            <div id="filters">
-                <!-- TODO: Category, source, quality filter dropdowns -->
+
+    <div id="app-layout">
+        <!-- Sidebar: categories + filters -->
+        <aside id="sidebar">
+            <div class="sidebar-section">
+                <h2 class="sidebar-heading">Categories</h2>
+                <nav id="category-nav" aria-label="Material categories">
+                    <!-- Populated by JS -->
+                </nav>
             </div>
-        </section>
-        <section id="results">
-            <!-- TODO: Spectrum catalog table -->
-        </section>
-        <section id="viewer">
-            <div id="spectral-chart">
-                <!-- TODO: D3.js spectral plot container -->
+            <div class="sidebar-section">
+                <h2 class="sidebar-heading">Instrument</h2>
+                <div id="instrument-filters">
+                    <!-- Populated by JS -->
+                </div>
             </div>
-            <div id="metadata-panel">
-                <!-- TODO: Sample metadata display -->
+            <div class="sidebar-section">
+                <h2 class="sidebar-heading">Measurement</h2>
+                <div id="measurement-filters">
+                    <!-- Populated by JS -->
+                </div>
             </div>
-        </section>
-    </main>
-    <footer>
-        <p>Data sources: USGS splib07, ECOSTRESS, ASTER/JPL, EMIT L2B</p>
-        <p><a href="https://github.com/chrislyonsKY/speclib">GitHub</a> · GPL-3.0</p>
+            <div class="sidebar-section sidebar-stats" id="sidebar-stats">
+                <!-- Populated by JS -->
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main id="main-content">
+            <!-- Search bar -->
+            <div id="search-bar">
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="search-input"
+                           placeholder="Search 2,500+ spectra — mineral, vegetation, invasive species, material name..."
+                           aria-label="Search spectra"
+                           autocomplete="off">
+                    <span id="search-count" class="search-count"></span>
+                </div>
+            </div>
+
+            <!-- Chart area -->
+            <section id="chart-section" aria-label="Spectral plot">
+                <div id="chart-toolbar">
+                    <div class="toolbar-left">
+                        <h2 id="chart-title">Select a spectrum to view</h2>
+                    </div>
+                    <div class="toolbar-right">
+                        <select id="view-mode" class="toolbar-select" title="Chart view mode">
+                            <option value="reflectance">Reflectance</option>
+                            <option value="continuum">Continuum Removed</option>
+                            <option value="derivative1">1st Derivative</option>
+                            <option value="derivative2">2nd Derivative</option>
+                        </select>
+                        <label class="toolbar-toggle" title="Show Landsat 8/9 OLI bands">
+                            <input type="checkbox" id="toggle-landsat"> Landsat
+                        </label>
+                        <label class="toolbar-toggle" title="Show Sentinel-2 MSI bands">
+                            <input type="checkbox" id="toggle-sentinel"> Sentinel-2
+                        </label>
+                        <label class="toolbar-toggle" title="Show diagnostic absorption features">
+                            <input type="checkbox" id="toggle-absorptions"> Absorptions
+                        </label>
+                        <label class="toolbar-toggle" title="Show convolved sensor values as points">
+                            <input type="checkbox" id="toggle-convolution"> Convolve
+                        </label>
+                        <button id="btn-stats" class="toolbar-btn" title="Show mean +/- std envelope">Stats</button>
+                        <button id="btn-band-math" class="toolbar-btn" title="Compute NDVI, NDWI, etc.">Indices</button>
+                        <button id="btn-clear-chart" class="toolbar-btn" title="Clear all traces">Clear</button>
+                        <button id="btn-download-csv" class="toolbar-btn" title="Download as CSV" disabled>CSV</button>
+                        <button id="btn-download-png" class="toolbar-btn" title="Download chart as PNG" disabled>PNG</button>
+                    </div>
+                </div>
+                <div id="band-math-panel" class="hidden" aria-label="Band index results"></div>
+                <div id="spectral-chart" role="img" aria-label="Spectral reflectance chart"></div>
+                <div id="chart-legend" aria-label="Chart legend"></div>
+            </section>
+
+            <!-- Comparison tray -->
+            <section id="comparison-tray" aria-label="Spectrum comparison">
+                <div class="tray-header">
+                    <h3>Comparison Tray <span id="tray-count">(0/6)</span></h3>
+                    <button id="btn-clear-tray" class="toolbar-btn">Clear All</button>
+                </div>
+                <div id="tray-items"></div>
+            </section>
+
+            <!-- Results table -->
+            <section id="results-section" aria-label="Search results">
+                <div id="results-header">
+                    <h2>Spectra Catalog</h2>
+                    <span id="results-count"></span>
+                </div>
+                <div id="results-table-wrapper">
+                    <table id="results-table" aria-label="Spectra catalog">
+                        <thead>
+                            <tr>
+                                <th class="col-compare"></th>
+                                <th class="col-name sortable" data-sort="name">Name</th>
+                                <th class="col-category sortable" data-sort="category">Category</th>
+                                <th class="col-instrument sortable" data-sort="instrument">Instrument</th>
+                                <th class="col-range sortable" data-sort="wl_min">Range (µm)</th>
+                                <th class="col-bands sortable" data-sort="n_bands">Bands</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="pagination">
+                    <button id="btn-prev" class="page-btn" disabled>&larr; Previous</button>
+                    <span id="page-info"></span>
+                    <button id="btn-next" class="page-btn">Next &rarr;</button>
+                </div>
+            </section>
+
+            <!-- Metadata panel (shown when spectrum selected) -->
+            <aside id="metadata-panel" class="hidden" aria-label="Spectrum metadata">
+                <h3 id="meta-title"></h3>
+                <dl id="meta-fields"></dl>
+                <div id="meta-citation"></div>
+            </aside>
+        </main>
+    </div>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <p>Data: <a href="https://www.usgs.gov/labs/spectroscopy-lab/science/spectral-library" target="_blank" rel="noopener">USGS Spectral Library v7</a> · ECOSTRESS · ASTER/JPL · EMIT L2B</p>
+            <p><a href="https://github.com/chrislyonsKY/speclib" target="_blank" rel="noopener">GitHub</a> · GPL-3.0 · Built with <a href="https://plotly.com/javascript/" target="_blank" rel="noopener">Plotly.js</a></p>
+        </div>
     </footer>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+
     <script src="js/spectral-chart.js"></script>
     <script src="js/app.js"></script>
 </body>

@@ -26,4 +26,6 @@ abstract: >-
   A federated spectral signature library platform aggregating
   reflectance spectra from USGS Spectral Library v7, ECOSTRESS,
   ASTER/JPL, and EMIT L2B, with Kentucky-focused collections
-  including invasive species spectral data from Lyons et al. (2024).
+  including invasive species spectral data from Lyons, Gyawali,
+  Cristan, Acharya, Gebremedhin, & Andries (2024,
+  doi:10.1080/01431161.2024.2391095).

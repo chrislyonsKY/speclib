@@ -21,7 +21,7 @@ These rules apply to ALL code generated for this project, regardless of which ag
 - D3.js v7 — use selection.join() pattern, not enter/update/exit
 - All chart dimensions derived from container, not hardcoded
 - Accessible: ARIA labels on interactive elements, keyboard navigation for charts
-- No external JS frameworks — vanilla JS + D3.js only
+- No external JS frameworks — vanilla JS + Plotly.js for charting (approved override of original D3.js-only constraint)
 
 ## Data Integrity
 

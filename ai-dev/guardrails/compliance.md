@@ -8,7 +8,7 @@
 - ASTER/JPL data: Check JPL distribution terms — typically unrestricted with attribution
 - EMIT data: NASA open data policy — attribute as "NASA/JPL EMIT Mission"
 - All exported files must include a provenance/attribution block in metadata
-- Kentucky field data (Lyons et al. 2024): Cite as published — include DOI in metadata
+- Kentucky field data (Lyons, Gyawali, Cristan, Acharya, Gebremedhin, & Andries, 2024): Cite as published — include DOI 10.1080/01431161.2024.2391095 in metadata
 
 ## WCAG 2.1 Level AA (Web Interface)
 

@@ -243,7 +243,7 @@ class KyFieldAdapter(BaseAdapter):
             measurement_date=meas_date,
             description=f"Leaf reflectance, {position} canopy, site {site}{site_num}",
             locality=f"{site.title()} Trails, Kentucky" if site != "unknown" else "Kentucky",
-            citation="Lyons, C., et al. (2024). International Journal of Remote Sensing.",
+            citation="Lyons, W. C., Gyawali, B. R., Cristan, R., Acharya, S., Gebremedhin, M., & Andries, K. (2024). Evaluating spectral properties of invasive plant species in Kentucky recreation areas. International Journal of Remote Sensing, 45(18), 6470-6494. https://doi.org/10.1080/01431161.2024.2391095",
             source_filename=csv_path.name,
             extra=raw.metadata,
         )
