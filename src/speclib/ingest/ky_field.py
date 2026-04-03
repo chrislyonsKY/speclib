@@ -39,11 +39,25 @@ _FILENAME_RE = re.compile(
     r"(?P<timestamp>\d+)$"
 )
 
+# Specimen ID pattern (from CSV header): {Site}{number}_{Position}{measurement}
+_SPECIMEN_RE = re.compile(
+    r"^(?P<site>[a-zA-Z]+)(?P<site_num>\d+)_"
+    r"(?P<position>lower|mid|upper)(?P<meas_num>\d+)$",
+    re.IGNORECASE,
+)
+
 # Site-to-species mapping
 _SITE_SPECIES: dict[str, tuple[str, str]] = {
     "shelby": ("Amur honeysuckle", "Lonicera maackii"),
     "raven": ("Amur honeysuckle", "Lonicera maackii"),
     "bernheim": ("Callery pear", "Pyrus calleryana"),
+}
+
+# Site-to-locality mapping
+_SITE_LOCALITY: dict[str, str] = {
+    "shelby": "Shelby Trails, Kentucky",
+    "raven": "Raven Run, Kentucky",
+    "bernheim": "Bernheim Forest, Kentucky",
 }
 
 # Collection date mapping (from directory names)
@@ -85,8 +99,19 @@ class KyFieldAdapter(BaseAdapter):
 
                 stem = csv_path.stem
                 parsed = _parse_filename(stem)
+
+                # For "untitled" files, read specimen ID from CSV header
+                if parsed.get("site") == "unknown":
+                    specimen_id = _read_specimen_id(csv_path)
+                    if specimen_id:
+                        header_parsed = _parse_specimen_id(specimen_id)
+                        if header_parsed:
+                            parsed = header_parsed
+
                 site = parsed.get("site", "unknown")
-                common_name, _ = _SITE_SPECIES.get(site, ("Unknown", "Unknown"))
+                common_name, _ = _SITE_SPECIES.get(
+                    site.lower(), ("Unknown", "Unknown")
+                )
 
                 records.append(
                     SourceRecord(
@@ -133,6 +158,12 @@ class KyFieldAdapter(BaseAdapter):
             line = line.strip()
             if not line:
                 continue
+
+            # Stop at calibration/metadata sections that follow Layer 1
+            if line.startswith("Peak Wavelength"):
+                break
+            if "Calibration" in line:
+                break
 
             # Detect layer boundaries (new "Layer Title" header signals next layer)
             if line.startswith("Layer Title") or line.startswith("Layer "):
@@ -207,6 +238,14 @@ class KyFieldAdapter(BaseAdapter):
         csv_path = Path(raw.record_id)
         parsed = _parse_filename(csv_path.stem)
 
+        # For "untitled" files, use specimen ID from CSV header
+        if parsed.get("site") == "unknown":
+            specimen_id = raw.metadata.get("specimen_id", "")
+            if specimen_id:
+                header_parsed = _parse_specimen_id(specimen_id)
+                if header_parsed:
+                    parsed = header_parsed
+
         # Convert wavelength nm -> um
         wavelengths_um = raw.wavelengths / 1000.0
 
@@ -218,7 +257,7 @@ class KyFieldAdapter(BaseAdapter):
         reflectance[outside_range] = np.nan
 
         # Determine species from site name
-        site = parsed.get("site", "unknown")
+        site = parsed.get("site", "unknown").lower()
         common_name, binomial = _SITE_SPECIES.get(site, ("Unknown invasive", "Unknown"))
 
         # Determine collection date from parent directory
@@ -242,7 +281,7 @@ class KyFieldAdapter(BaseAdapter):
             instrument="CID CI-710 (Ocean Optics USB4000)",
             measurement_date=meas_date,
             description=f"Leaf reflectance, {position} canopy, site {site}{site_num}",
-            locality=f"{site.title()} Trails, Kentucky" if site != "unknown" else "Kentucky",
+            locality=_SITE_LOCALITY.get(site, "Kentucky"),
             citation=(
                 "Lyons, W. C., Gyawali, B. R., Cristan, R., Acharya, S.,"
                 " Gebremedhin, M., & Andries, K. (2024). Evaluating spectral"
@@ -325,6 +364,43 @@ def _find_data_start(lines: list[str]) -> int:
         if line.strip().startswith("Wavelength,"):
             return i + 1
     return 6  # fallback
+
+
+def _read_specimen_id(csv_path: Path) -> str:
+    """Read the specimen ID from a SpectraSnap! CSV header.
+
+    Args:
+        csv_path: Path to the CSV file.
+
+    Returns:
+        Specimen ID string, or empty string if not found.
+    """
+    with csv_path.open() as f:
+        _header_line = f.readline()  # "Layer Title, Color, Specimen ID"
+        data_line = f.readline().strip()
+    parts = data_line.split(",")
+    if len(parts) >= 3:
+        return parts[2].strip()
+    return ""
+
+
+def _parse_specimen_id(specimen_id: str) -> dict[str, str] | None:
+    """Parse a specimen ID string into site/position/number components.
+
+    Args:
+        specimen_id: Specimen ID from CSV header (e.g., "Bernheim1_Lower1").
+
+    Returns:
+        Dict with site, site_num, position, meas_num keys, or None if no match.
+    """
+    match = _SPECIMEN_RE.match(specimen_id)
+    if match:
+        groups = match.groupdict()
+        # Normalize to lowercase for consistent site-species lookup
+        groups["site"] = groups["site"].lower()
+        groups["position"] = groups["position"].lower()
+        return groups
+    return None
 
 
 def _parse_calculations(calc_path: Path) -> dict[str, float]:
