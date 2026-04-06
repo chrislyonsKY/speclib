@@ -12,7 +12,7 @@ The interoperability layer across all three language packages is the **file form
 
 ### HDF5 Archive Schema
 
-- Group hierarchy: `/minerals/`, `/vegetation/`, `/soils/`, `/rocks/`, `/manmade/`, `/mixtures/`, `/nonphotosyntheticvegetation/`, `/ky/`
+- Group hierarchy (follows architecture.md conventions — plural for countable nouns, singular/collective otherwise): `/minerals/`, `/vegetation/`, `/soils/`, `/rocks/`, `/manmade/`, `/mixtures/`, `/nonphotosyntheticvegetation/`, `/ky/`
 - Each spectrum dataset contains:
   - `wavelengths` — `float64[]`, micrometers (um), sorted ascending
   - `reflectance` — `float64[]`, 0.0-1.0 scale
@@ -52,6 +52,23 @@ The interoperability layer across all three language packages is the **file form
   - Expected JSON catalog output
   - Checksum manifests
 - Any language implementation can run these to validate format compliance
+
+### Naming Conventions
+
+Consistent naming across all three packages and the format spec:
+
+| Context | Convention | Examples |
+|---------|-----------|----------|
+| Type/class names | Singular PascalCase | `Spectrum`, `SpectralLibrary`, `QualityFlag` |
+| Single item references | Singular | "a spectrum", `spectrum_id`, `loadSpectrum()` |
+| Collection references | Plural | "3,311 spectra", `compareSpectra()` |
+| HDF5 category groups | Plural for countable, singular for collective | `/minerals/`, `/rocks/`, `/soils/` but `/vegetation/`, `/manmade/`, `/nonphotosyntheticvegetation/` |
+| Parquet/JSON directories | Plural | `spectra/*.parquet`, `spectra/{id}.json` |
+| Enum values (Python) | Singular uppercase | `MINERAL`, `ROCK`, `VEGETATION` |
+| Rust enum variants | Singular PascalCase | `Mineral`, `Rock`, `Vegetation` |
+| R S4 classes | Singular PascalCase | `Spectrum`, `SpectralLibrary` |
+| Source file names | Singular | `spectrum.rs`, `spectrum.R`, `spectrum.py` |
+| Spectrum IDs | `{source}_{category}_{name_slug}_{hash8}` | `ecostress_mineral_quartz_a1b2c3d4` |
 
 ### Schema Versioning
 
@@ -267,7 +284,7 @@ speclib-r/
 │   └── convert.R              # as_hsdar(), as_spectrolab(), as_prospectr(), from_hsdar(), etc.
 ├── man/                       # roxygen2-generated documentation
 │   └── figures/
-│       └── logo.svg           # Generated hex sticker
+│       └── logo.png           # Generated hex sticker
 ├── vignettes/
 │   ├── getting-started.Rmd    # Load, browse, plot speclib data
 │   ├── matching.Rmd           # Spectral identification workflow
@@ -295,7 +312,7 @@ speclib-r/
 - Design: stylized vegetation reflectance curve showing the characteristic red-edge jump at ~0.7 um
 - Dark background, spectral curve with gradient or color highlighting the red-edge feature
 - Package name "speclib" along the bottom edge
-- Output: SVG and PNG at `man/figures/logo.svg`, `man/figures/logo.png`
+- Output: PNG at `man/figures/logo.png`
 - Used in README, pkgdown site, CRAN listing
 
 ---
