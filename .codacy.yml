@@ -9,6 +9,10 @@ engines:
   prospector:
     enabled: false
 
+tools:
+  - name: prospector
+    enabled: false
+
 exclude_paths:
   - "data/**"
   - "docs/**"
@@ -17,3 +21,4 @@ exclude_paths:
   - "ai-dev/**"
   - "**/*.h5"
   - "**/*.parquet"
+  - "tests/**"
