@@ -182,9 +182,7 @@ class Spectrum:
         raise NotImplementedError
 
     @staticmethod
-    def _generate_id(
-        source: str, category: str, name: str, source_filename: str = ""
-    ) -> str:
+    def _generate_id(source: str, category: str, name: str, source_filename: str = "") -> str:
         """Generate a deterministic spectrum ID.
 
         Args:
