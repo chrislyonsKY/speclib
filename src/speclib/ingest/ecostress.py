@@ -26,32 +26,6 @@ from speclib.ingest.base import BaseAdapter, RawSpectrum, SourceRecord
 
 logger = logging.getLogger(__name__)
 
-# Header field names in ECOSTRESS/ASTER spectrum files
-_HEADER_FIELDS = [
-    "Name",
-    "Type",
-    "Class",
-    "SubClass",
-    "ParticleSize",
-    "Genus",
-    "Species",
-    "SampleNo",
-    "Owner",
-    "WavelengthRange",
-    "Origin",
-    "CollectionDate",
-    "Description",
-    "Measurement",
-    "FirstColumn",
-    "SecondColumn",
-    "WavelengthUnit",
-    "DataUnit",
-    "FirstXValue",
-    "LastXValue",
-    "NumberOfXValues",
-    "AdditionalInformation",
-]
-
 # Mapping from ECOSTRESS Type field to MaterialCategory
 _TYPE_MAP: dict[str, str] = {
     "mineral": "MINERAL",
@@ -62,6 +36,7 @@ _TYPE_MAP: dict[str, str] = {
     "manmade": "MANMADE",
     "mixture": "MIXTURE",
     "organic": "ORGANIC",
+    "non photosynthetic vegetation": "NONPHOTOSYNTHETIC_VEGETATION",
 }
 
 
@@ -123,11 +98,20 @@ class EcostressAdapter(BaseAdapter):
         wavelengths: list[float] = []
         values: list[float] = []
 
-        with txt_path.open() as f:
+        with txt_path.open(encoding="utf-8", errors="replace") as f:
             lines = f.readlines()
 
-        # Data starts after the header (first ~20 lines)
-        data_start = min(len(_HEADER_FIELDS), len(lines))
+        # Find data start: first line after a blank line that follows header
+        data_start = 0
+        in_header = True
+        for i, line in enumerate(lines):
+            if in_header:
+                if not line.strip():
+                    in_header = False
+            else:
+                data_start = i
+                break
+
         for line in lines[data_start:]:
             line = line.strip()
             if not line:
@@ -145,8 +129,8 @@ class EcostressAdapter(BaseAdapter):
             except ValueError:
                 continue
 
-        wl_unit = header.get("WavelengthUnit", "micrometer").lower()
-        data_unit = header.get("DataUnit", "").lower()
+        wl_unit = header.get("X Units", "").lower()
+        data_unit = header.get("Y Units", "").lower()
 
         refl_scale = "percent" if "percent" in data_unit else "fractional"
 
@@ -175,6 +159,12 @@ class EcostressAdapter(BaseAdapter):
         if raw.wavelength_unit == "nm" or (len(wavelengths) > 0 and wavelengths[0] > 100):
             wavelengths = wavelengths / 1000.0
 
+        # Sort ascending if wavelengths are descending
+        if len(wavelengths) > 1 and wavelengths[0] > wavelengths[-1]:
+            sort_idx = np.argsort(wavelengths)
+            wavelengths = wavelengths[sort_idx]
+            reflectance = reflectance[sort_idx]
+
         # Convert percentage to fractional
         if raw.reflectance_scale == "percent":
             reflectance = reflectance / 100.0
@@ -193,10 +183,10 @@ class EcostressAdapter(BaseAdapter):
             material_name=name,
             material_category=category,
             source_library=source_lib,
-            source_record_id=Path(raw.record_id).stem,
+            source_record_id=header.get("Sample No.", Path(raw.record_id).stem),
             measurement_type=MeasurementType.LABORATORY,
             license=self.config.get("license", "CC0 / Public Domain"),
-            material_subcategory=header.get("SubClass", ""),
+            material_subcategory=header.get("Subclass", header.get("Class", "")),
             formula=header.get("Class", ""),
             instrument=header.get("Measurement", ""),
             description=header.get("Description", ""),
@@ -204,6 +194,43 @@ class EcostressAdapter(BaseAdapter):
             citation=self.config.get("citation", ""),
             source_filename=Path(raw.record_id).name,
         )
+
+        # Store genus/species in extra if present
+        extra: dict[str, str] = {}
+        if header.get("Genus"):
+            extra["genus"] = header["Genus"]
+        if header.get("Species"):
+            extra["species"] = header["Species"]
+        if header.get("Particle Size"):
+            extra["particle_size"] = header["Particle Size"]
+        if header.get("Wavelength Range"):
+            extra["wavelength_range"] = header["Wavelength Range"]
+        if header.get("Owner"):
+            extra["owner"] = header["Owner"]
+        if header.get("Collection Date"):
+            extra["collection_date"] = header["Collection Date"]
+
+        # Link paired ancillary file if it exists
+        ancillary_name = Path(raw.record_id).name.replace(".spectrum.txt", ".ancillary.txt")
+        ancillary_file = Path(raw.record_id).parent / ancillary_name
+        if ancillary_file.exists():
+            try:
+                anc_data = _read_ancillary(ancillary_file)
+                if "ancillary_text" in anc_data:
+                    extra["ancillary_text"] = anc_data["ancillary_text"]
+                if anc_data.get("Chemistry"):
+                    extra["chemistry"] = anc_data["Chemistry"]
+                if anc_data.get("Biophysical Properties"):
+                    extra["biophysical_properties"] = anc_data["Biophysical Properties"]
+                if anc_data.get("Reference"):
+                    citation = self.config.get("citation", "")
+                    ref = anc_data["Reference"]
+                    metadata.citation = f"{citation}; {ref}" if citation else ref
+            except Exception:
+                logger.warning("Failed to read ancillary file: %s", ancillary_file)
+
+        if extra:
+            metadata.extra = extra
 
         return Spectrum(
             name=name,
@@ -214,20 +241,60 @@ class EcostressAdapter(BaseAdapter):
         )
 
 
+def _read_ancillary(path: Path) -> dict[str, str]:
+    """Read an ECOSTRESS/ASTER ancillary metadata file.
+
+    Ancillary files have the same key-value header as spectrum files,
+    followed by freeform text containing chemistry, XRD analysis, etc.
+
+    Args:
+        path: Path to the .ancillary.txt file.
+
+    Returns:
+        Dictionary with parsed header fields plus 'ancillary_text'
+        containing any freeform content below the header.
+    """
+    result = _read_header(path)
+
+    with path.open(encoding="utf-8", errors="replace") as f:
+        all_lines = f.readlines()
+
+    # Find where header ends (first blank line)
+    body_start = 0
+    for i, line in enumerate(all_lines):
+        if not line.strip():
+            body_start = i + 1
+            break
+
+    freeform = "".join(all_lines[body_start:]).strip()
+    if freeform:
+        result["ancillary_text"] = freeform
+
+    return result
+
+
 def _read_header(path: Path) -> dict[str, str]:
     """Read the structured header from an ECOSTRESS/ASTER spectrum file.
 
+    Parses key-value pairs separated by the first colon on each line.
+    Header ends at the blank line following the last header field.
+
     Args:
-        path: Path to the .spectrum.txt file.
+        path: Path to the .spectrum.txt or .ancillary.txt file.
 
     Returns:
-        Dictionary mapping header field names to values.
+        Dictionary mapping header field names to their values.
     """
     header: dict[str, str] = {}
-    with path.open() as f:
-        for i, line in enumerate(f):
-            if i >= len(_HEADER_FIELDS):
+    with path.open(encoding="utf-8", errors="replace") as f:
+        for line in f:
+            stripped = line.strip()
+            if not stripped:
                 break
-            value = line.strip()
-            header[_HEADER_FIELDS[i]] = value
+            if ":" in stripped:
+                key, _, value = stripped.partition(":")
+                header[key.strip()] = value.strip()
+            else:
+                if header:
+                    break
     return header
