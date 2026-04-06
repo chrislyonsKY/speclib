@@ -7,4 +7,4 @@ citation: >
   Remote Sensing of Environment, 230, 111196.
 license: "CC0 / Public Domain"
 data_url: "https://speclib.jpl.nasa.gov/"
-data_dir: null  # e.g., ~/data/ecostress/
+data_dir: "data/upstream/downloads/ecostress"
