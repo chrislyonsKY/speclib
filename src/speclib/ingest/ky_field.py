@@ -109,9 +109,7 @@ class KyFieldAdapter(BaseAdapter):
                             parsed = header_parsed
 
                 site = parsed.get("site", "unknown")
-                common_name, _ = _SITE_SPECIES.get(
-                    site.lower(), ("Unknown", "Unknown")
-                )
+                common_name, _ = _SITE_SPECIES.get(site.lower(), ("Unknown", "Unknown"))
 
                 records.append(
                     SourceRecord(
