@@ -11,12 +11,12 @@ const SpectralChart = (() => {
 
     // --- Trace palette: colorblind-safe, WCAG 3:1 contrast ---
     const PALETTE = [
-        ['#1a56db', 'solid',     'circle'],
-        ['#dc2626', 'dash',      'square'],
-        ['#16a34a', 'dot',       'diamond'],
-        ['#d97706', 'dashdot',   'triangle-up'],
-        ['#7c3aed', 'longdash',  'cross'],
-        ['#0891b2', 'longdashdot','x'],
+        ['#005ea2', 'solid',     'circle'],
+        ['#d54309', 'dash',      'square'],
+        ['#00a91c', 'dot',       'diamond'],
+        ['#112e51', 'dashdot',   'triangle-up'],
+        ['#7ca8d2', 'longdash',  'cross'],
+        ['#e5a000', 'longdashdot','x'],
     ];
 
     // --- Sensor band definitions (center wavelength, FWHM in µm) ---
@@ -312,7 +312,7 @@ const SpectralChart = (() => {
                 range: yRange, fixedrange: false,
             },
             plot_bgcolor: bgColor, paper_bgcolor: paperBg,
-            font: { family: 'Inter, -apple-system, sans-serif', color: textColor },
+            font: { family: '"Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', color: textColor },
             margin: { l: 65, r: 20, t: 10, b: 50 },
             hovermode: 'x unified', dragmode: 'zoom', showlegend: false,
             shapes, annotations,

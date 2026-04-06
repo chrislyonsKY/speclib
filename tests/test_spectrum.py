@@ -54,6 +54,10 @@ class TestMaterialCategory:
         assert MaterialCategory.VEGETATION.value == "VEGETATION"
         assert MaterialCategory.SOIL.value == "SOIL"
 
+    def test_nonphotosynthetic_vegetation_category(self):
+        """Non-photosynthetic vegetation category is defined."""
+        assert MaterialCategory.NONPHOTOSYNTHETIC_VEGETATION.value == "NONPHOTOSYNTHETIC_VEGETATION"
+
 
 class TestSourceLibrary:
     """Tests for SourceLibrary enum."""
