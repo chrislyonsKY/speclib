@@ -1,0 +1,17 @@
+[package]
+name = "speclib-cli"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-only"
+description = "Command-line interface for the speclib spectral signature library"
+repository = "https://github.com/chrislyonsKY/speclib"
+keywords = ["spectral", "remote-sensing", "cli"]
+
+[[bin]]
+name = "speclib"
+path = "src/main.rs"
+
+[dependencies]
+speclib-core = { path = "../speclib-core" }
+clap = { version = "4", features = ["derive"] }
+serde_json = "1"
