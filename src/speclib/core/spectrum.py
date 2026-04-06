@@ -130,7 +130,8 @@ class Spectrum:
             source = source.value if source else "unknown"
             cat = getattr(meta, "material_category", None)
             cat = cat.value if cat else "unknown"
-            self.spectrum_id = self._generate_id(source, cat, self.name)
+            filename = getattr(meta, "source_filename", "")
+            self.spectrum_id = self._generate_id(source, cat, self.name, filename)
 
     @property
     def n_bands(self) -> int:
@@ -180,18 +181,21 @@ class Spectrum:
         raise NotImplementedError
 
     @staticmethod
-    def _generate_id(source: str, category: str, name: str) -> str:
+    def _generate_id(
+        source: str, category: str, name: str, source_filename: str = ""
+    ) -> str:
         """Generate a deterministic spectrum ID.
 
         Args:
             source: Source library identifier.
             category: Material category.
             name: Spectrum name.
+            source_filename: Original filename for disambiguation.
 
         Returns:
             ID in format {source}_{category}_{name_slug}_{hash8}.
         """
         slug = name.lower().replace(" ", "_")[:40]
-        hash_input = f"{source}:{category}:{name}"
+        hash_input = f"{source}:{category}:{name}:{source_filename}"
         hash8 = hashlib.sha256(hash_input.encode()).hexdigest()[:8]
         return f"{source.lower()}_{category.lower()}_{slug}_{hash8}"
