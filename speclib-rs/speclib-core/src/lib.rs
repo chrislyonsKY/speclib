@@ -2,6 +2,7 @@
 
 pub mod error;
 pub mod id;
+pub mod json;
 pub mod types;
 
 pub use error::Error;
