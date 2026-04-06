@@ -61,3 +61,4 @@ config.local.yaml
 # ai-dev/ is committed to version control but excluded from AI auto-scanning.
 # Remove the comment below only if you want to fully exclude it from git as well.
 # ai-dev/
+speclib-rs/target/
