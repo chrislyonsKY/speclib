@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterator
+from datetime import UTC, datetime
 from pathlib import Path
 
 import h5py
@@ -40,6 +41,12 @@ class HDF5Archive:
         group_path = f"/{category}/{spectrum.spectrum_id}"
 
         with h5py.File(self.path, "a") as f:
+            # Ensure /metadata group exists with version info
+            if "metadata" not in f:
+                meta_grp = f.create_group("metadata")
+                meta_grp.attrs["version"] = "1.0.0"
+                meta_grp.attrs["created"] = datetime.now(UTC).isoformat()
+
             if group_path in f:
                 del f[group_path]
 
@@ -128,6 +135,7 @@ class HDF5Archive:
 
         with h5py.File(self.path, "r") as f:
             categories = [category.value.lower()] if category else list(f.keys())
+            categories = [c for c in categories if c != "metadata"]
             for cat_name in categories:
                 if cat_name in f and isinstance(f[cat_name], h5py.Group):
                     for spectrum_id in f[cat_name]:
@@ -150,6 +158,8 @@ class HDF5Archive:
             HDF5 group or None if not found.
         """
         for cat_name in f:
+            if cat_name == "metadata":
+                continue
             if isinstance(f[cat_name], h5py.Group) and spectrum_id in f[cat_name]:
                 return f[cat_name][spectrum_id]
         return None

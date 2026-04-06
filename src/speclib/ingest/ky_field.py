@@ -374,7 +374,7 @@ def _read_specimen_id(csv_path: Path) -> str:
         Specimen ID string, or empty string if not found.
     """
     with csv_path.open() as f:
-        _header_line = f.readline()  # "Layer Title, Color, Specimen ID"
+        f.readline()  # skip header: "Layer Title, Color, Specimen ID"
         data_line = f.readline().strip()
     parts = data_line.split(",")
     if len(parts) >= 3:

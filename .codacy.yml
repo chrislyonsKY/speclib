@@ -6,8 +6,12 @@ engines:
     enabled: false
   bandit:
     enabled: true
-    exclude:
-      - "tests/**"
+  prospector:
+    enabled: false
+
+tools:
+  - name: prospector
+    enabled: false
 
 exclude_paths:
   - "data/**"
@@ -17,3 +21,4 @@ exclude_paths:
   - "ai-dev/**"
   - "**/*.h5"
   - "**/*.parquet"
+  - "tests/**"

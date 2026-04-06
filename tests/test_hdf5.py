@@ -3,6 +3,7 @@
 import tempfile
 from pathlib import Path
 
+import h5py
 import numpy as np
 
 from speclib.core.metadata import SampleMetadata
@@ -114,3 +115,29 @@ class TestHDF5Archive:
             assert result.metadata.material_name == "Quartz"
             assert result.metadata.source_library == SourceLibrary.USGS_SPLIB07
             assert result.metadata.license == "US Public Domain"
+
+
+class TestHDF5Metadata:
+    """Tests for archive-level metadata."""
+
+    def test_write_creates_metadata_group(self):
+        """Writing a spectrum creates /metadata group with version."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            archive = HDF5Archive(Path(tmpdir) / "test.h5")
+            archive.write(_make_spectrum())
+
+            with h5py.File(archive.path, "r") as f:
+                assert "metadata" in f
+                assert "version" in f["metadata"].attrs
+                assert f["metadata"].attrs["version"] == "1.0.0"
+
+    def test_metadata_has_created_timestamp(self):
+        """Archive metadata includes created timestamp."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            archive = HDF5Archive(Path(tmpdir) / "test.h5")
+            archive.write(_make_spectrum())
+
+            with h5py.File(archive.path, "r") as f:
+                assert "created" in f["metadata"].attrs
+                created = f["metadata"].attrs["created"]
+                assert "T" in created or "-" in created
