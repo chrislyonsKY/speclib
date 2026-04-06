@@ -10,6 +10,12 @@ pub enum Error {
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
+    #[error("Parquet error: {0}")]
+    Parquet(#[from] parquet::errors::ParquetError),
+
+    #[error("Arrow error: {0}")]
+    Arrow(#[from] arrow::error::ArrowError),
+
     #[error("validation error: {0}")]
     Validation(String),
 }
