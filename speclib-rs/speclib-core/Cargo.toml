@@ -1,10 +1,11 @@
 [package]
 name = "speclib-core"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "GPL-3.0-only"
 description = "Core types and I/O for the speclib federated spectral signature library"
 repository = "https://github.com/chrislyonsKY/speclib"
+readme = "README.md"
 keywords = ["spectral", "remote-sensing", "spectroscopy", "geospatial"]
 categories = ["science", "parser-implementations"]
 
