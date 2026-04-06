@@ -14,12 +14,19 @@ macro_rules! str_enum {
         }
 
         impl $name {
+            /// String representation matching the format spec.
             pub fn as_str(&self) -> &'static str {
                 match self { $(Self::$variant => $str),+ }
             }
+        }
 
-            pub fn from_str(s: &str) -> Option<Self> {
-                match s { $($str => Some(Self::$variant)),+, _ => None }
+        impl std::str::FromStr for $name {
+            type Err = String;
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    $($str => Ok(Self::$variant)),+,
+                    _ => Err(format!("unknown {} value: {s}", stringify!($name))),
+                }
             }
         }
 
@@ -211,21 +218,18 @@ mod tests {
     #[test]
     fn quality_flag_roundtrip() {
         assert_eq!(QualityFlag::Verified.as_str(), "VERIFIED");
-        assert_eq!(QualityFlag::from_str("VERIFIED"), Some(QualityFlag::Verified));
-        assert_eq!(QualityFlag::from_str("GOOD"), Some(QualityFlag::Good));
-        assert_eq!(QualityFlag::from_str("INVALID"), None);
+        assert_eq!("VERIFIED".parse::<QualityFlag>().unwrap(), QualityFlag::Verified);
+        assert_eq!("GOOD".parse::<QualityFlag>().unwrap(), QualityFlag::Good);
+        assert!("INVALID".parse::<QualityFlag>().is_err());
     }
 
     #[test]
     fn material_category_roundtrip() {
         assert_eq!(MaterialCategory::Mineral.as_str(), "MINERAL");
+        assert_eq!("MINERAL".parse::<MaterialCategory>().unwrap(), MaterialCategory::Mineral);
         assert_eq!(
-            MaterialCategory::from_str("MINERAL"),
-            Some(MaterialCategory::Mineral)
-        );
-        assert_eq!(
-            MaterialCategory::from_str("NONPHOTOSYNTHETIC_VEGETATION"),
-            Some(MaterialCategory::NonphotosyntheticVegetation)
+            "NONPHOTOSYNTHETIC_VEGETATION".parse::<MaterialCategory>().unwrap(),
+            MaterialCategory::NonphotosyntheticVegetation
         );
     }
 
@@ -245,29 +249,17 @@ mod tests {
     #[test]
     fn source_library_roundtrip() {
         assert_eq!(SourceLibrary::UsgsSplib07.as_str(), "USGS_SPLIB07");
-        assert_eq!(
-            SourceLibrary::from_str("USGS_SPLIB07"),
-            Some(SourceLibrary::UsgsSplib07)
-        );
-        assert_eq!(
-            SourceLibrary::from_str("ECOSTRESS"),
-            Some(SourceLibrary::Ecostress)
-        );
-        assert_eq!(SourceLibrary::from_str("NONEXISTENT"), None);
+        assert_eq!("USGS_SPLIB07".parse::<SourceLibrary>().unwrap(), SourceLibrary::UsgsSplib07);
+        assert_eq!("ECOSTRESS".parse::<SourceLibrary>().unwrap(), SourceLibrary::Ecostress);
+        assert!("NONEXISTENT".parse::<SourceLibrary>().is_err());
     }
 
     #[test]
     fn measurement_type_roundtrip() {
         assert_eq!(MeasurementType::Laboratory.as_str(), "LABORATORY");
-        assert_eq!(
-            MeasurementType::from_str("FIELD"),
-            Some(MeasurementType::Field)
-        );
-        assert_eq!(
-            MeasurementType::from_str("SPACEBORNE"),
-            Some(MeasurementType::Spaceborne)
-        );
-        assert_eq!(MeasurementType::from_str("UNKNOWN"), None);
+        assert_eq!("FIELD".parse::<MeasurementType>().unwrap(), MeasurementType::Field);
+        assert_eq!("SPACEBORNE".parse::<MeasurementType>().unwrap(), MeasurementType::Spaceborne);
+        assert!("UNKNOWN".parse::<MeasurementType>().is_err());
     }
 
     #[test]

@@ -113,16 +113,14 @@ fn spectrum_from_json(sj: SpectrumJson) -> Spectrum {
         errors: None,
         metadata: Metadata {
             material_name: mj.material_name,
-            material_category: MaterialCategory::from_str(&mj.material_category)
-                .unwrap_or_default(),
+            material_category: mj.material_category.parse().unwrap_or_default(),
             material_subcategory: None,
             formula: None,
-            source_library: SourceLibrary::from_str(&mj.source_library).unwrap_or_default(),
+            source_library: mj.source_library.parse().unwrap_or_default(),
             source_record_id: mj.source_record_id,
             source_filename: None,
             instrument: None,
-            measurement_type: MeasurementType::from_str(&mj.measurement_type)
-                .unwrap_or_default(),
+            measurement_type: mj.measurement_type.parse().unwrap_or_default(),
             measurement_date: None,
             grain_size: None,
             purity: None,
@@ -144,7 +142,7 @@ fn spectrum_from_json(sj: SpectrumJson) -> Spectrum {
                 Some(mj.citation)
             },
             license: mj.license,
-            quality: QualityFlag::from_str(&mj.quality).unwrap_or_default(),
+            quality: mj.quality.parse().unwrap_or_default(),
             ingested_at: String::new(),
             adapter_version: String::new(),
         },

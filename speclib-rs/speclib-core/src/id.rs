@@ -74,4 +74,12 @@ mod tests {
         let last8 = &id[id.len() - 8..];
         assert!(last8.chars().all(|c| c.is_ascii_hexdigit()));
     }
+
+    #[test]
+    fn matches_python_implementation() {
+        // Python: Spectrum._generate_id("ECOSTRESS", "MINERAL", "Quartz SiO2", "quartz.txt")
+        // Returns: "ecostress_mineral_quartz_sio2_c49fe9e5"
+        let id = generate_id("ECOSTRESS", "MINERAL", "Quartz SiO2", "quartz.txt");
+        assert_eq!(id, "ecostress_mineral_quartz_sio2_c49fe9e5");
+    }
 }
